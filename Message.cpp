@@ -30,6 +30,10 @@ const char * Message::split_string(size_t       start,
 }
 
 
-bool Message::should_server_exit(const Message &rhs){
+bool Message::should_server_exit(){
     return this->data == "q";
+}
+
+Message::~Message(){
+    data.clear();
 }

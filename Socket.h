@@ -4,9 +4,7 @@ MAX UDP PACKET IN IPv4 65507
 */
 
 #ifndef SOCKET_H
-#define SOCKET_H 
-
-#define MAX_UDP_DATA_PACKET 65507
+#define SOCKET_H
 
 
 #include <sys/socket.h>
@@ -17,8 +15,10 @@ MAX UDP PACKET IN IPv4 65507
 #include <stdio.h>
 #include <stdlib.h> 
 #include <string.h>
+#include <algorithm>
 
 #include "Message.h"
+#include "UDPPacket.h"
 
 class Socket {
 

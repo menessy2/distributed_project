@@ -4,6 +4,8 @@
 #include "Server.h"
 #include "Message.h"
 
+#define NUMBER_THREADPOOL 4
+
 using namespace std;
 
 void usage(char ** argv)
@@ -39,14 +41,11 @@ int main(int argc,char ** argv)
     {
         //Server  s(port);
         Server s;
-        Message received_message;
+        s.set_ThreadPool_size(NUMBER_THREADPOOL);
         
         for (;;){
-            s.receive_from_clients(&received_message);
-            if ( received_message.should_server_exit() ){
-                printf("Server is exiting ...\n");
-                break;
-            }
+             if ( s.wait_and_handle_clients() == -1 )
+                 exit(-1);
         }
     }
     else

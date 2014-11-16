@@ -8,12 +8,13 @@ class Message {
 
 public:
         Message();
+        ~Message();
 	Message(char *m);
 	size_t get_message_size();
         void set_string(char *str);
         const char *split_string(size_t start, size_t end);
         const char *get_c_string();
-        bool should_server_exit(const Message &rhs);
+        bool should_server_exit();
 
 private:
 

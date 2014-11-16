@@ -3,6 +3,7 @@
 
 Server::Server(unsigned short port) : Socket(port)
 {
+    
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
         perror("socket creation failed");
@@ -24,12 +25,21 @@ Server::Server(unsigned short port) : Socket(port)
     
 }
 
-status Server::receive_from_clients(Message * received_message)
-{
-    status get_request_status = GetRequest(received_message, sockfd, &servaddr);
-    status reply_status       = SendReply(received_message, sockfd, servaddr );
+void Server::set_ThreadPool_size(size_t threads_size){
+    pool  = new ThreadPool(threads_size);
+}
 
-    return reply_status;
+void Server::handle_client(Message * received_message)
+{
+     //status get_request_status;
+    status reply_status;
+    pool->enqueue( [&](){
+            //get_request_status = GetRequest(received_message, sockfd, &servaddr);
+            reply_status       = SendReply(received_message, sockfd, servaddr );
+        } 
+    );
+
+    //return reply_status;
 }
 
 status Server::GetRequest(Message *       callMessage,
@@ -52,4 +62,27 @@ void Server::makeReceiverSA(SocketAddress * sa,
     sa -> sin_addr.s_addr = htonl(INADDR_ANY);
 }
 
+
+Server::~Server(){
+    delete pool;
+}
+
+
+int Server::wait_and_handle_clients(){
+    Message received_msg;
+    Socket::UDPreceive(sockfd, &received_msg, &servaddr);
+    if ( received_msg.should_server_exit() ){
+        printf("Server is exiting ...\n");
+        return -1;
+    } 
+    
+    pool->enqueue( [=](){
+            //get_request_status = GetRequest(received_message, sockfd, &servaddr);
+            SendReply(&const_cast<Message&>(received_msg), sockfd, servaddr );
+        } 
+    );
+        
+    //handle_client(&received_msg);
+    return 0;
+}
 

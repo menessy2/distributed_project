@@ -42,7 +42,9 @@ status Socket::UDPsend(int           s,
     int n, accumulative = 0;
     for (int i = 0; i * MAX_UDP_DATA_PACKET < message -> get_message_size(); i++)
     {
-        if ((n = sendto(s, message->get_c_string(), message->get_message_size(), 0, (struct sockaddr*) &destination,
+        int start = i * MAX_UDP_DATA_PACKET;
+        int length = std::min(MAX_UDP_DATA_PACKET,(int)message->get_message_size()-start);
+        if ((n = sendto(s, message->split_string(start,length), length, 0, (struct sockaddr*) &destination,
                         sizeof(SocketAddress))) < 0)
         {
             perror("Send failed\n");
@@ -71,7 +73,8 @@ status Socket::UDPreceive(int             s,
                           SocketAddress * origin)
 {
     int  n;
-    char received_message[MAX_UDP_DATA_PACKET];
+    char received_message[MAX_UDP_DATA_PACKET+1];
+    memset(received_message,0,MAX_UDP_DATA_PACKET);
     origin -> sin_family = AF_INET;
     unsigned int length_received_msg = sizeof(SocketAddress);
     if ((n = recvfrom(s, received_message, MAX_UDP_DATA_PACKET, 0, (struct sockaddr*) origin, &length_received_msg))
@@ -82,7 +85,8 @@ status Socket::UDPreceive(int             s,
     }
     else
     {
-        printf("Received Message:( %s ), length = %d\n", received_message, n);
+        received_message[n] = '\0';
+        printf("Received Message: ( %s ), length = %d\n", received_message, n);
         STATUS = OK;
     }
     m->set_string(received_message);
