@@ -30,6 +30,11 @@ const char * Message::split_string(size_t       start,
 }
 
 
+std::string Message::copy_message(){
+    return this->data;
+}
+
+
 bool Message::should_server_exit(){
     return this->data == "q";
 }

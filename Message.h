@@ -15,6 +15,7 @@ public:
         const char *split_string(size_t start, size_t end);
         const char *get_c_string();
         bool should_server_exit();
+        std::string copy_message();
 
 private:
 
