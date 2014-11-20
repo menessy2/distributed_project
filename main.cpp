@@ -1,7 +1,7 @@
 #include <iostream>
 #include <stdio.h>
-#include "Client.h"
-#include "Server.h"
+#include "Client/Client.h"
+#include "Server/Server.h"
 #include "Message.h"
 
 #define NUMBER_THREADPOOL 4
