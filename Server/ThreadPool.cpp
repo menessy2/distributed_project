@@ -25,7 +25,7 @@ void Worker::operator()()
         }   // release lock
  
         // execute the task
-        task();
+        task();                 // Class instance of UserHandler
     }
 }
 

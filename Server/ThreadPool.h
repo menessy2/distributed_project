@@ -30,7 +30,7 @@ private:
     friend class Worker;
  
     // need to keep track of threads so we can join them
-    std::vector< std::UserHandler > workers;
+    std::vector< std::thread > workers;
  
     // the task queue
     std::deque< std::function<void()> > tasks;

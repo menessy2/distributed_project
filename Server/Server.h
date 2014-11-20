@@ -15,7 +15,7 @@ public:
         int wait_and_handle_clients();
         void set_ThreadPool_size(size_t threads_size);
 	void handle_client(Message * received_message);
-        void dispatch_connection_to_UserHandler(char *received_message,);
+        void dispatch_connection_to_UserHandler(char *received_msg,SocketAddress sck);
 	status GetRequest (Message *callMessage, int s, SocketAddress *clientSA);
 	status SendReply  (Message *replyMessage, int s, SocketAddress clientSA);
 

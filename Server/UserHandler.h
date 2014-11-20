@@ -1,22 +1,18 @@
-/* 
- * File:   UserHandler.h
- * Author: root
- *
- * Created on November 20, 2014, 6:58 PM
- */
-
 #ifndef USERHANDLER_H
 #define	USERHANDLER_H
 
 #include <thread>
 
-class UserHandler : public std::thread {
+#include "../UDP/UDPPacket.h"
+
+class UserHandler {
 public:
     UserHandler();
     UserHandler(const UserHandler& orig);
     virtual ~UserHandler();
 private:
-
+    int keep_alive;
+    UDPPacketsHandler packets_handler; 
 };
 
 #endif	/* USERHANDLER_H */

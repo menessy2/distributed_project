@@ -42,6 +42,10 @@ void Server::handle_client(Message * received_message)
     //return reply_status;
 }
 
+void Server::dispatch_connection_to_UserHandler(char *received_msg,SocketAddress sck){
+    
+}
+
 status Server::GetRequest(Message *       callMessage,
                           int             s,
                           SocketAddress * clientSA)
