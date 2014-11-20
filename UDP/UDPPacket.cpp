@@ -11,8 +11,8 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd), curs
     starting_sequence_number = rand() % (1 << SEQUENCE_NUMBER_LENGTH*BYTE_SIZE);
 }
 
-void UDPPacketsHandler::parse_UDPPacket(char *){
-    
+void UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
+    packets_vector.push_back(UDPPacket(bytes_array));
 }
 
 
