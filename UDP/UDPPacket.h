@@ -2,7 +2,7 @@
 #define	UDPPACKET_H
 
 #include <sys/time.h>
-#include <vector>
+#include <queue>
 
 #include "Message.h"
 #include "UDPCommands.h"
@@ -24,18 +24,26 @@
 
 #define BYTE_SIZE   8
 
+
+
 // Used for parsing after receiving the packet
 class UDPPacket{
 public:
     UDPPacket(char *);
-    
+    friend bool operator<(UDPPacket& udp1, UDPPacket& udp2);
     
 private:
     UPD_ENUM_COMMANDS command;
+    unsigned short sequence_number;
+    short remaining_packets;
+    unsigned long int timestamp;
+    char checksum[SC_CHECKSUM_LENGTH+1];
     std::string::iterator start_pos;
     std::string::iterator end_pos;
 };
 
+bool operator<(UDPPacket& udp1, UDPPacket& udp2);
+void 
 
 class UDPPacketsHandler {
 public:
@@ -56,10 +64,11 @@ private:
     size_t cursor;        // represents the position from which the handler will start read from 
     unsigned short starting_sequence_number;
     std::string data;
+    unsigned int max_number_of_packets_to_receive;
     UPD_ENUM_COMMANDS command;
     
     // For receiving packets
-    std::vector<UDPPacket> packets;
+    std::priority_queue<UDPPacket> packets_vector;
     
     void construct_header(byte *packet);
     void set_timestamp(byte *buffer);
