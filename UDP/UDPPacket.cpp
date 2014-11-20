@@ -45,6 +45,10 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd),
     starting_sequence_number = rand() % (1 << SEQUENCE_NUMBER_LENGTH*BYTE_SIZE);
 }
 
+bool UDPPacketsHandler::is_transmission_reached_to_end(){
+    
+}
+
 void UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
     UDPPacket packet = UDPPacket(bytes_array);
     
@@ -61,6 +65,7 @@ void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
     construct_header(packet);
     size = std::min(MAX_UDP_DATA_PACKET,(int)(this->data.length()- this->cursor) );
     packet = this->data.substr(cursor, size).c_str();
+    cursor += size;
 }
 
 void UDPPacketsHandler::set_timestamp(byte *buffer) {

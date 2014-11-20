@@ -12,7 +12,11 @@ public:
     virtual ~UserHandler();
 private:
     int keep_alive;
-    UDPPacketsHandler packets_handler; 
+    UDPPacketsHandler packets_handler;
+    
+    char *connected_ip; // = inet_ntoa(client.sin_addr);
+    int port; // = ntohs(client.sin_port); 
+    
 };
 
 #endif	/* USERHANDLER_H */
