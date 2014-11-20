@@ -38,12 +38,10 @@ private:
     short remaining_packets;
     unsigned long int timestamp;
     char checksum[SC_CHECKSUM_LENGTH+1];
-    std::string::iterator start_pos;
-    std::string::iterator end_pos;
+    std::string data;
 };
 
 bool operator<(UDPPacket& udp1, UDPPacket& udp2);
-void 
 
 class UDPPacketsHandler {
 public:

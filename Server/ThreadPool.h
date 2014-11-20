@@ -6,6 +6,8 @@
 #include <condition_variable>
 #include <vector>
 #include <deque>
+
+#include "UserHandler.h"
  
 class ThreadPool;
   
@@ -28,7 +30,7 @@ private:
     friend class Worker;
  
     // need to keep track of threads so we can join them
-    std::vector< std::thread > workers;
+    std::vector< std::UserHandler > workers;
  
     // the task queue
     std::deque< std::function<void()> > tasks;
