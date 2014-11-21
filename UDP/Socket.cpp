@@ -91,7 +91,6 @@ status Socket::UDPreceive(int             s,
     else
     {
         received_message[n] = '\0';
-        packets_handler.parse_UDPPacket(received_message);
         //printf("Received Message: ( %s ), length = %d\n", received_message, n);
         STATUS = OK;
     }

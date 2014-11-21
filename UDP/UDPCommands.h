@@ -10,7 +10,7 @@ enum class UPD_ENUM_COMMANDS  {
     AUTH,
 };
 
-
+/*
 class UDPCommands {
 public:
     UDPCommands() = 0;
@@ -18,6 +18,6 @@ public:
 private:
 
 };
-
+*/
 #endif	/* UDPCOMMANDS_H */
 

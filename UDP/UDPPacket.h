@@ -3,8 +3,9 @@
 
 #include <sys/time.h>
 #include <queue>
+#include <string.h>
 
-#include "Message.h"
+#include "../Message.h"
 #include "UDPCommands.h"
 
 //      FOLLOWING NUMBERS ARE IN BYTES 
@@ -29,9 +30,8 @@
 // Used for parsing after receiving the packet
 class UDPPacket{
 public:
-    UDPPacket(char *);
-    friend bool operator<(UDPPacket& udp1, UDPPacket& udp2);
-    
+    UDPPacket(const char *);
+    friend bool operator<(const UDPPacket& udp1,const UDPPacket& udp2);
 private:
     UPD_ENUM_COMMANDS command;
     unsigned short sequence_number;
@@ -41,20 +41,19 @@ private:
     std::string data;
 };
 
-bool operator<(UDPPacket& udp1, UDPPacket& udp2);
+bool operator<(const UDPPacket& udp1,const UDPPacket& udp2);
 
 class UDPPacketsHandler {
 public:
-    UDPPacketsHandler(const Message& rhs,UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+    UDPPacketsHandler(Message *rhs,UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
     UDPPacketsHandler(UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::IDLE);
-    virtual ~UDPPacketsHandler();
     
     // For sending packets
-    void get_next_packet(char *packet);
+    void get_next_packet(char *packet,int &size);
     bool is_transmission_reached_to_end();
     
     // For receiving packets
-    void parse_UDPPacket(char *);
+    void parse_UDPPacket(const char *);
     bool is_full_message_received();
     
     
@@ -68,11 +67,11 @@ private:
     // For receiving packets
     std::priority_queue<UDPPacket> packets_vector;
     
-    void construct_header(byte *packet);
-    void set_timestamp(byte *buffer);
-    void set_sequence_number(byte *buffer);
-    void set_remaining_packets(byte *buffer);
-    void set_command(byte *buffer);
+    void construct_header(char *packet);
+    void set_timestamp(char *buffer);
+    void set_sequence_number(char *buffer);
+    void set_remaining_packets(char *buffer);
+    void set_command(char *buffer);
 
 };
 

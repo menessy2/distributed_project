@@ -2,7 +2,7 @@
 #define CLIENT_H
 
 #include <stdio.h>
-#include "Socket.h"
+#include "../UDP/Socket.h"
 
 class Client: public Socket {
 

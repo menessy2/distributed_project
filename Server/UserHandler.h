@@ -6,19 +6,22 @@
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <string.h>
 
 #include "../UDP/UDPPacket.h"
 
-class UserHandler : public std::thread {
+class UserHandler /*: public std::thread*/ {
 public:
-    UserHandler(char *client_ip,int port);
-    void notify_user_about_incomming_message(char *msg);
+    UserHandler();
+    UserHandler(const char *client_ip,int port);
+    UserHandler(const UserHandler& rhs);
+    void notify_user_about_incomming_message(const char *msg);
     virtual ~UserHandler();
     void set_port(int _port);
     void set_ip(char *ip_address);
     char *get_ip();
     int get_port();
-    void operator()(char *message=NULL);
+    void operator()();
     
 private:
     int keep_alive;

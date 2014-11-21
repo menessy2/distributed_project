@@ -42,14 +42,16 @@ void Server::handle_client(Message * received_message)
     //return reply_status;
 }
 
-void Server::dispatch_connection_to_UserHandler(char *received_msg,SocketAddress sck){
+void Server::dispatch_connection_to_UserHandler(const char *received_msg,SocketAddress sck){
     std::string ip = std::string(inet_ntoa(sck.sin_addr));
     std::string port = std::to_string(ntohs(sck.sin_port));
     std::string result = ip+":"+port;
     if ( user_handlers.count(result) > 0 ){
-        user_handlers[result].second(received_msg);
+        UserHandler *handler = &user_handlers[result];
+        handler->notify_user_about_incomming_message(received_msg);
     } else {
-        user_handlers.insert( std::pair<char*,int>(ip.c_str(),ntohs(sck.sin_port)) );
+        user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
+                UserHandler(ip.c_str(),ntohs(sck.sin_port))  ) );
     }
     
 }

@@ -7,6 +7,7 @@
 
 #include "UDPCommands.h"
 
+/*
 UDPCommands::UDPCommands() {
 }
 
@@ -15,4 +16,6 @@ UDPCommands::UDPCommands(const UDPCommands& orig) {
 
 UDPCommands::~UDPCommands() {
 }
+ * 
+*/
 

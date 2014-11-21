@@ -2,13 +2,13 @@
 #define	SECURITY_H
 
 #include <string>
-#include <cryptopp/sha.h>
-#include <cryptopp/hex.h>
-#include <cryptopp/files.h>
+//#include <cryptopp/sha.h>
+//#include <cryptopp/hex.h>
+//#include <cryptopp/files.h>
 
 #define SECURITY_PSK "this is a password"
 
-static class Security {
+class Security {
 public:
     
     static std::string calculate_hash(char *);

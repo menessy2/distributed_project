@@ -17,7 +17,7 @@ MAX UDP PACKET IN IPv4 65507
 #include <string.h>
 #include <algorithm>
 
-#include "Message.h"
+#include "../Message.h"
 #include "UDPPacket.h"
 
 class Socket {
