@@ -6,8 +6,6 @@
 #include <condition_variable>
 #include <vector>
 #include <deque>
-
-#include "UserHandler.h"
  
 class ThreadPool;
   

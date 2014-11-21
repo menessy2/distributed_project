@@ -14,7 +14,7 @@
 #include "../UDP/Socket.h"
 #include "../Message.h"
 #include "ThreadPool.h"
-
+#include "UserHandler.h"
 
 class Server: public Socket {
 
@@ -23,7 +23,6 @@ public:
         ~Server();
         int wait_and_handle_clients();
         void set_ThreadPool_size(size_t threads_size);
-	void handle_client(Message * received_message);
         void dispatch_connection_to_UserHandler(const char *received_msg,SocketAddress sck);
 	status GetRequest (Message *callMessage, int s, SocketAddress *clientSA);
 	status SendReply  (Message *replyMessage, int s, SocketAddress clientSA);
@@ -31,7 +30,8 @@ public:
 private:
 	void makeReceiverSA(SocketAddress *sa, unsigned short port=0);
         Socket *mysock;
-        ThreadPool *pool;
+        ThreadPool *outgoing_responses;
+        ThreadPool *incomming_requests;
         std::map<std::string, UserHandler> user_handlers;
 };
 

@@ -15,13 +15,14 @@ public:
     UserHandler();
     UserHandler(const char *client_ip,int port);
     UserHandler(const UserHandler& rhs);
+    void initialize_thread(const char *msg);
     void notify_user_about_incomming_message(const char *msg);
     virtual ~UserHandler();
     void set_port(int _port);
     void set_ip(char *ip_address);
     char *get_ip();
     int get_port();
-    void operator()();
+    void loop();
     
 private:
     int keep_alive;

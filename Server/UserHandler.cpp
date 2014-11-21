@@ -8,6 +8,12 @@ UserHandler::UserHandler(const char *client_ip,int port) : port(port) {
     
 }
 
+void UserHandler::initialize_thread(const char *msg){
+    messages_vector.push_back(std::string(msg));
+    loop();
+}
+
+
 UserHandler::UserHandler(const UserHandler& rhs){
     keep_alive = rhs.keep_alive;
     messages_vector = rhs.messages_vector;
@@ -35,8 +41,9 @@ void UserHandler::notify_user_about_incomming_message(const char *msg){
     condition.notify_one();
 }
 
-void UserHandler::operator()(){
-    
+void UserHandler::loop(){
+    std::unique_lock<std::mutex> lock(queue_mutex);
+    //condition.wait(lock);
     while( ! packets_handler.is_full_message_received() ){
         
         std::unique_lock<std::mutex> lock(queue_mutex);

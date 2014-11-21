@@ -26,20 +26,8 @@ Server::Server(unsigned short port) : Socket(port)
 }
 
 void Server::set_ThreadPool_size(size_t threads_size){
-    pool  = new ThreadPool(threads_size);
-}
-
-void Server::handle_client(Message * received_message)
-{
-     //status get_request_status;
-    status reply_status;
-    pool->enqueue( [&](){
-            //get_request_status = GetRequest(received_message, sockfd, &servaddr);
-            reply_status       = SendReply(received_message, sockfd, servaddr );
-        } 
-    );
-
-    //return reply_status;
+    outgoing_responses  = new ThreadPool(threads_size);
+    incomming_requests = new ThreadPool(threads_size);
 }
 
 void Server::dispatch_connection_to_UserHandler(const char *received_msg,SocketAddress sck){
@@ -78,25 +66,37 @@ void Server::makeReceiverSA(SocketAddress * sa,
 
 
 Server::~Server(){
-    delete pool;
+    delete outgoing_responses;
+    delete incomming_requests;
 }
 
 
 int Server::wait_and_handle_clients(){
     Message received_msg;
     Socket::UDPreceive(sockfd, &received_msg, &servaddr);
-    dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
+    //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
+    
+    incomming_requests->enqueue( [=](){
+            std::string s = received_msg.copy_message();
+            char *msg = const_cast<char *>(s.c_str());
+            dispatch_connection_to_UserHandler(msg,servaddr);
+            SendReply(&const_cast<Message&>(received_msg), sockfd, servaddr );
+        } 
+    );
+    
+    /*
     if ( received_msg.should_server_exit() ){
         printf("Server is exiting ...\n");
         return -1;
     } 
     
-    pool->enqueue( [=](){
+    
+    outgoing_responses->enqueue( [=](){
             //get_request_status = GetRequest(received_message, sockfd, &servaddr);
             SendReply(&const_cast<Message&>(received_msg), sockfd, servaddr );
         } 
     );
-        
+    */    
     //handle_client(&received_msg);
     return 0;
 }

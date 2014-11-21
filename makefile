@@ -1,6 +1,7 @@
 CC=g++
 
-CFLAGS=-c -Wall -Wl,--no-as-needed -pthread -std=c++11 -fpermissive -g
+ADDIT = -std=c++11 -Wl,--no-as-needed -pthread -ggdb
+CFLAGS=-c $(ADDIT)
 
 all: hello
 
@@ -8,7 +9,7 @@ hello: main.o Message.o Security.o \
 	UDP/Socket.o UDP/UDPCommands.o UDP/UDPPacket.o \
 	Server/Server.o Server/ThreadPool.o Server/UserHandler.o  \
 	Client/Client.o
-	$(CC) main.o Message.o Security.o \
+	$(CC) $(ADDIT) main.o Message.o Security.o \
 		Socket.o UDPCommands.o UDPPacket.o \
 		Server.o ThreadPool.o UserHandler.o  \
 		Client.o -o executable

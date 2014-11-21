@@ -8,7 +8,7 @@ bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
 ///////////////////////////////////////////////////////////////////////////////
 
 UDPPacket::UDPPacket(const char *packet){
-    char *timestamp_START = packet + SC_CHECKSUM_LENGTH;
+    char *timestamp_START = const_cast<char *>(packet) + SC_CHECKSUM_LENGTH;
     char *sequence_number_START = timestamp_START + TIMESTAMP_LENGTH;
     char *remaining_packets_START = sequence_number_START + SEQUENCE_NUMBER_LENGTH;
     char *command_START = remaining_packets_START + COMMANDS_LENGTH;
@@ -63,7 +63,7 @@ void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
 
     construct_header(packet);
     size = std::min(MAX_UDP_DATA_PACKET,(int)(this->data.length()- this->cursor) );
-    packet = this->data.substr(cursor, size).c_str();
+    packet = const_cast<char *>(this->data.substr(cursor, size).c_str());
     cursor += size;
 }
 
