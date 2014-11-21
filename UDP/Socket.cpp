@@ -45,7 +45,7 @@ status Socket::UDPsend(int           s,
     
     UDPPacketsHandler packetsHandler(message);
     
-    while ( packetsHandler.is_transmission_reached_to_end() )
+    while ( ! packetsHandler.is_transmission_reached_to_end() )
     {
         bzero(packet, MAX_UDP_DATA_PACKET);
         packetsHandler.get_next_packet(packet,actual_packet_size);
@@ -63,11 +63,11 @@ status Socket::UDPsend(int           s,
         accumulative += n;
     }
 
-    if (accumulative == message->get_message_size() && accumulative != 0)
-    {
+    //if (accumulative == message->get_message_size() && accumulative != 0)
+    //{
         printf("Data was sent successfully:  %d bytes\n", accumulative);
         STATUS = OK;
-    }
+    //}
 
     return STATUS;
 }

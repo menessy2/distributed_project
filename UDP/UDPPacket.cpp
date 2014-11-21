@@ -45,7 +45,7 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd),
 }
 
 bool UDPPacketsHandler::is_transmission_reached_to_end(){
-    
+    return ( cursor + 1 ) >= data.size();
 }
 
 void UDPPacketsHandler::parse_UDPPacket(const char *bytes_array){

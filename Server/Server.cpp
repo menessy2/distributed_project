@@ -38,8 +38,10 @@ void Server::dispatch_connection_to_UserHandler(const char *received_msg,SocketA
         UserHandler *handler = &user_handlers[result];
         handler->notify_user_about_incomming_message(received_msg);
     } else {
+        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port));
         user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
-                UserHandler(ip.c_str(),ntohs(sck.sin_port))  ) );
+                user ) );
+        user.initialize_thread(received_msg);
     }
     
 }

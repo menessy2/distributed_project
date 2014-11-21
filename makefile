@@ -1,6 +1,6 @@
 CC=g++
 
-ADDIT = -std=c++11 -Wl,--no-as-needed -pthread -ggdb
+ADDIT = -std=c++11 -Wl,--no-as-needed -pthread -ggdb -fpermissive
 CFLAGS=-c $(ADDIT)
 
 all: hello
