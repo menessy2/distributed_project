@@ -3,7 +3,7 @@
 UserHandler::UserHandler(){}
 
 
-UserHandler::UserHandler(const char *client_ip,int port) : /*std::thread(this()),*/ port(port) {
+UserHandler::UserHandler(const char *client_ip,int port) : port(port) {
     memcpy(connected_ip,client_ip,IPv4_SIZE);
     
 }

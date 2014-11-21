@@ -10,7 +10,7 @@
 
 #include "../UDP/UDPPacket.h"
 
-class UserHandler /*: public std::thread*/ {
+class UserHandler  {
 public:
     UserHandler();
     UserHandler(const char *client_ip,int port);
