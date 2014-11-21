@@ -46,7 +46,7 @@ bool operator<(UDPPacket& udp1, UDPPacket& udp2);
 class UDPPacketsHandler {
 public:
     UDPPacketsHandler(const Message& rhs,UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
-    UDPPacketsHandler(UPD_ENUM_COMMANDS command);
+    UDPPacketsHandler(UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::IDLE);
     virtual ~UDPPacketsHandler();
     
     // For sending packets

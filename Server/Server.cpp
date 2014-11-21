@@ -43,6 +43,14 @@ void Server::handle_client(Message * received_message)
 }
 
 void Server::dispatch_connection_to_UserHandler(char *received_msg,SocketAddress sck){
+    std::string ip = std::string(inet_ntoa(sck.sin_addr));
+    std::string port = std::to_string(ntohs(sck.sin_port));
+    std::string result = ip+":"+port;
+    if ( user_handlers.count(result) > 0 ){
+        user_handlers[result].second(received_msg);
+    } else {
+        user_handlers.insert( std::pair<char*,int>(ip.c_str(),ntohs(sck.sin_port)) );
+    }
     
 }
 
@@ -75,6 +83,7 @@ Server::~Server(){
 int Server::wait_and_handle_clients(){
     Message received_msg;
     Socket::UDPreceive(sockfd, &received_msg, &servaddr);
+    dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
     if ( received_msg.should_server_exit() ){
         printf("Server is exiting ...\n");
         return -1;

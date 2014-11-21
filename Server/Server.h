@@ -2,6 +2,15 @@
 #define SERVER_H
 
 #include <stdio.h>
+#include <vector>
+#include <map>
+#include <string>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
+
 #include "Socket.h"
 #include "Message.h"
 #include "ThreadPool.h"
@@ -23,6 +32,7 @@ private:
 	void makeReceiverSA(SocketAddress *sa, unsigned short port=0);
         Socket *mysock;
         ThreadPool *pool;
+        std::map<std::string, UserHandler> user_handlers;
 };
 
 #endif

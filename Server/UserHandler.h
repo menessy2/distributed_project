@@ -1,21 +1,34 @@
 #ifndef USERHANDLER_H
 #define	USERHANDLER_H
 
+#define IPv4_SIZE   4       
+
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 
 #include "../UDP/UDPPacket.h"
 
-class UserHandler {
+class UserHandler : public std::thread {
 public:
-    UserHandler();
-    UserHandler(const UserHandler& orig);
+    UserHandler(char *client_ip,int port);
+    void notify_user_about_incomming_message(char *msg);
     virtual ~UserHandler();
+    void set_port(int _port);
+    void set_ip(char *ip_address);
+    char *get_ip();
+    int get_port();
+    void operator()(char *message=NULL);
+    
 private:
     int keep_alive;
     UDPPacketsHandler packets_handler;
+    std::vector<std::string> messages_vector;
     
-    char *connected_ip; // = inet_ntoa(client.sin_addr);
-    int port; // = ntohs(client.sin_port); 
+    std::mutex queue_mutex;
+    std::condition_variable condition;
+    char connected_ip[IPv4_SIZE]; 
+    int port; 
     
 };
 

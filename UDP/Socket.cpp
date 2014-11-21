@@ -81,23 +81,19 @@ status Socket::UDPreceive(int             s,
     origin -> sin_family = AF_INET;
     unsigned int length_received_msg = sizeof(SocketAddress);
     
-    UDPPacketsHandler packets_handler(UPD_ENUM_COMMANDS::IDLE);
-    
-    while ( ! packets_handler.is_full_message_received() ){
-        memset(received_message,0,MAX_UDP_DATA_PACKET);
-        if ((n = recvfrom(s, received_message, MAX_UDP_DATA_PACKET, 0, 
-                         (struct sockaddr*) origin, &length_received_msg))  < 0)
-        {
-            perror("Error on Receiving");
-            STATUS = BAD;
-        }
-        else
-        {
-            received_message[n] = '\0';
-            packets_handler.parse_UDPPacket(received_message)
-            //printf("Received Message: ( %s ), length = %d\n", received_message, n);
-            STATUS = OK;
-        }
+    memset(received_message,0,MAX_UDP_DATA_PACKET);
+    if ((n = recvfrom(s, received_message, MAX_UDP_DATA_PACKET, 0, 
+                     (struct sockaddr*) origin, &length_received_msg))  < 0)
+    {
+        perror("Error on Receiving");
+        STATUS = BAD;
+    }
+    else
+    {
+        received_message[n] = '\0';
+        packets_handler.parse_UDPPacket(received_message);
+        //printf("Received Message: ( %s ), length = %d\n", received_message, n);
+        STATUS = OK;
     }
     
     m->set_string(received_message);
