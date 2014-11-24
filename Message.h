@@ -1,25 +1,26 @@
 #ifndef MESSAGE_H
 #define MESSAGE_H
 
-#include <string>
 #include <sys/types.h>
+#include <cstring>
 
 class Message {
 
 public:
-        Message();
-        ~Message();
-	Message(char *m);
-	size_t get_message_size();
-        void set_string(char *str);
-        const char *split_string(size_t start, size_t end);
-        const char *get_c_string();
-        bool should_server_exit();
-        std::string copy_message();
+    Message();
+    ~Message();
+    Message(char *m,size_t size);
+    size_t get_message_size();
+    void set_string(char *str, size_t size);
+    void split_string(size_t start, const size_t len, char *buffer);
+    const char *get_c_string();
+    bool should_server_exit();
 
 private:
-
-	std::string data; 
+    size_t size;    
+    char *data_array;
+	//std::string data; 
+    
 };
 
 enum status { 

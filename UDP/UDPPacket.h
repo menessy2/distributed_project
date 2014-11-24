@@ -3,7 +3,7 @@
 
 #include <sys/time.h>
 #include <queue>
-#include <string.h>
+#include <string>
 
 #include "../Message.h"
 #include "UDPCommands.h"
@@ -47,6 +47,7 @@ class UDPPacketsHandler {
 public:
     UDPPacketsHandler(Message *rhs,UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
     UDPPacketsHandler(UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::IDLE);
+    const char *get_data();
     
     // For sending packets
     void get_next_packet(char *packet,int &size);
@@ -60,7 +61,7 @@ public:
 private:
     size_t cursor;        // represents the position from which the handler will start read from 
     unsigned short starting_sequence_number;
-    std::string data;
+    Message *msg;
     unsigned int max_number_of_packets_to_receive;
     UPD_ENUM_COMMANDS command;
     

@@ -33,7 +33,7 @@ int main(int argc,char ** argv)
         unsigned int port = atoi(argv[3]);
         Client  c;
         Message reply;
-        Message sentMessage(argv[4]);
+        Message sentMessage(argv[4],strlen(argv[4]));
 
         c.echo_reply_Message(&sentMessage, &reply, argv[2], port);
     }

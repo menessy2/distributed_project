@@ -52,7 +52,7 @@ void UserHandler::loop(){
         messages_vector.pop_back();
         condition.wait(lock);
     }
-    
+    std::cout << "Message was fully received: " << packets_handler.get_data() << std::endl;
 }
 
 

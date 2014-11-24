@@ -79,8 +79,7 @@ int Server::wait_and_handle_clients(){
     //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
     
     incomming_requests->enqueue( [=](){
-            std::string s = received_msg.copy_message();
-            char *msg = const_cast<char *>(s.c_str());
+            char *msg = const_cast<char *>(received_msg.get_c_string());
             dispatch_connection_to_UserHandler(msg,servaddr);
             SendReply(&const_cast<Message&>(received_msg), sockfd, servaddr );
         } 

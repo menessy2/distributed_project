@@ -57,15 +57,15 @@ status Socket::UDPsend(int           s,
             STATUS = BAD;
         }
 
-        if (n != message -> get_message_size())
-            printf("sent partial data: %d\n", n);
+        //if (n != message -> get_message_size())
+        //    printf("sent partial data: %d\n", n);
 
         accumulative += n;
     }
 
     //if (accumulative == message->get_message_size() && accumulative != 0)
     //{
-        printf("Data was sent successfully:  %d bytes\n", accumulative);
+        printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
         STATUS = OK;
     //}
 
@@ -95,7 +95,7 @@ status Socket::UDPreceive(int             s,
         STATUS = OK;
     }
     
-    m->set_string(received_message);
+    m->set_string(received_message,n);
     return STATUS;
 }
 

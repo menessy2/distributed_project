@@ -33,7 +33,7 @@ UDPPacket::UDPPacket(const char *packet){
 ///////////////////////////////////////////////////////////////////////////////
 
 UDPPacketsHandler::UDPPacketsHandler(Message *rhs, UPD_ENUM_COMMANDS cmd) :
-data(rhs->copy_message()), command(cmd), cursor(0), max_number_of_packets_to_receive(0) {
+msg(rhs), command(cmd), cursor(0), max_number_of_packets_to_receive(0) {
 
     starting_sequence_number = rand() % (1 << SEQUENCE_NUMBER_LENGTH*BYTE_SIZE);
 }
@@ -44,8 +44,12 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd),
     starting_sequence_number = rand() % (1 << SEQUENCE_NUMBER_LENGTH*BYTE_SIZE);
 }
 
+const char *UDPPacketsHandler::get_data(){
+    return msg->get_c_string();
+}
+
 bool UDPPacketsHandler::is_transmission_reached_to_end(){
-    return ( cursor + 1 ) >= data.size();
+    return ( cursor + 1 ) >= msg->get_message_size();
 }
 
 void UDPPacketsHandler::parse_UDPPacket(const char *bytes_array){
@@ -62,9 +66,13 @@ bool UDPPacketsHandler::is_full_message_received(){
 void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
 
     construct_header(packet);
-    size = std::min(MAX_UDP_DATA_PACKET,(int)(this->data.length()- this->cursor) );
-    packet = const_cast<char *>(this->data.substr(cursor, size).c_str());
+    size = std::min(MAX_UDP_DATA_PACKET,(int)(msg->get_message_size()- this->cursor) );
+    char *buffer = new char[size];
+    msg->split_string(cursor, size, buffer);
+    memcpy(packet+HEADER_SIZE, buffer ,size);
     cursor += size;
+    size += HEADER_SIZE;
+    delete buffer;
 }
 
 void UDPPacketsHandler::set_timestamp(char *buffer) {
@@ -82,7 +90,7 @@ void UDPPacketsHandler::set_sequence_number(char *buffer) {
 }
 
 void UDPPacketsHandler::set_remaining_packets(char *buffer) {
-    int remaining_packets = (data.length() - cursor) / DATA_LENGTH;
+    int remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
     sprintf (buffer, "%04x", remaining_packets);
 }
 
