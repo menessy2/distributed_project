@@ -78,20 +78,16 @@ int Server::wait_and_handle_clients(){
     Socket::UDPreceive(sockfd, &received_msg, &servaddr);
     //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
     
-    /*
-    incomming_requests->enqueue( [=](){
-            char *msg = new char[received_msg.get_message_size()];
-            //tmp_msg.get_c_string();
-            dispatch_connection_to_UserHandler(msg,servaddr);
-            SendReply(&Message(msg,received_msg.get_message_size()),sockfd,servaddr);
-        } 
-    );*/
     
-            Message msg = received_msg;
-            msg.debug_print_msg();
+    incomming_requests->enqueue( [=](){
+            received_msg.debug_print_msg();
             //tmp_msg.get_c_string();
-            dispatch_connection_to_UserHandler(&msg,servaddr);
-            SendReply(&msg,sockfd,servaddr);
+            dispatch_connection_to_UserHandler(&received_msg,servaddr);
+            SendReply(&received_msg,sockfd,servaddr);
+        } 
+    );
+    
+          
     
     /*
     if ( received_msg.should_server_exit() ){
