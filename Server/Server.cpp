@@ -1,7 +1,7 @@
 
 #include "Server.h"
 
-Server::Server(unsigned short port) : Socket(port)
+Server::Server(unsigned short port) : Socket(port)//Socket(port)
 {
     
     if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -30,18 +30,18 @@ void Server::set_ThreadPool_size(size_t threads_size){
     incomming_requests = new ThreadPool(threads_size);
 }
 
-void Server::dispatch_connection_to_UserHandler(const char *received_msg,SocketAddress sck){
+void Server::dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddress sck){
     std::string ip = std::string(inet_ntoa(sck.sin_addr));
     std::string port = std::to_string(ntohs(sck.sin_port));
     std::string result = ip+":"+port;
     if ( user_handlers.count(result) > 0 ){
         UserHandler *handler = &user_handlers[result];
-        handler->notify_user_about_incomming_message(received_msg);
+        handler->notify_user_about_incomming_message(*received_pkt);
     } else {
         UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port));
         user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
                 user ) );
-        user.initialize_thread(received_msg);
+        user.initialize_thread(received_pkt);
     }
     
 }
@@ -78,12 +78,20 @@ int Server::wait_and_handle_clients(){
     Socket::UDPreceive(sockfd, &received_msg, &servaddr);
     //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
     
+    /*
     incomming_requests->enqueue( [=](){
-            char *msg = const_cast<char *>(received_msg.get_c_string());
+            char *msg = new char[received_msg.get_message_size()];
+            //tmp_msg.get_c_string();
             dispatch_connection_to_UserHandler(msg,servaddr);
-            SendReply(&const_cast<Message&>(received_msg), sockfd, servaddr );
+            SendReply(&Message(msg,received_msg.get_message_size()),sockfd,servaddr);
         } 
-    );
+    );*/
+    
+            Message msg = received_msg;
+            msg.debug_print_msg();
+            //tmp_msg.get_c_string();
+            dispatch_connection_to_UserHandler(&msg,servaddr);
+            SendReply(&msg,sockfd,servaddr);
     
     /*
     if ( received_msg.should_server_exit() ){

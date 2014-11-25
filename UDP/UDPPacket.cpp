@@ -7,7 +7,7 @@ bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
 
 ///////////////////////////////////////////////////////////////////////////////
 
-UDPPacket::UDPPacket(const char *packet){
+UDPPacket::UDPPacket(char *packet){
     char *timestamp_START = const_cast<char *>(packet) + SC_CHECKSUM_LENGTH;
     char *sequence_number_START = timestamp_START + TIMESTAMP_LENGTH;
     char *remaining_packets_START = sequence_number_START + SEQUENCE_NUMBER_LENGTH;
@@ -45,14 +45,14 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd),
 }
 
 const char *UDPPacketsHandler::get_data(){
-    return msg->get_c_string();
+    return msg->get_data_without_header();
 }
 
 bool UDPPacketsHandler::is_transmission_reached_to_end(){
     return ( cursor + 1 ) >= msg->get_message_size();
 }
 
-void UDPPacketsHandler::parse_UDPPacket(const char *bytes_array){
+void UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
     UDPPacket packet = UDPPacket(bytes_array);
     
     packets_vector.push(packet);

@@ -10,14 +10,15 @@
 #include <iostream>
 
 #include "../UDP/UDPPacket.h"
+#include "../Message.h"
 
 class UserHandler  {
 public:
     UserHandler();
     UserHandler(const char *client_ip,int port);
     UserHandler(const UserHandler& rhs);
-    void initialize_thread(const char *msg);
-    void notify_user_about_incomming_message(const char *msg);
+    void initialize_thread(const Message *msg);
+    void notify_user_about_incomming_message(const Message &msg);
     virtual ~UserHandler();
     void set_port(int _port);
     void set_ip(char *ip_address);
@@ -28,7 +29,7 @@ public:
 private:
     int keep_alive;
     UDPPacketsHandler packets_handler;
-    std::vector<std::string> messages_vector;
+    std::vector<Message> messages_vector;
     
     std::mutex queue_mutex;
     std::condition_variable condition;

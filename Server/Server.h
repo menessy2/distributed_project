@@ -23,7 +23,7 @@ public:
         ~Server();
         int wait_and_handle_clients();
         void set_ThreadPool_size(size_t threads_size);
-        void dispatch_connection_to_UserHandler(const char *received_msg,SocketAddress sck);
+        void dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddress sck);
 	status GetRequest (Message *callMessage, int s, SocketAddress *clientSA);
 	status SendReply  (Message *replyMessage, int s, SocketAddress clientSA);
 

@@ -7,30 +7,17 @@
 
 #include "../Message.h"
 #include "UDPCommands.h"
-
+#include "UDPPacketConstants.h"
 //      FOLLOWING NUMBERS ARE IN BYTES 
 
-#define MAX_UDP_DATA_PACKET                 65507
 
-#define SC_CHECKSUM_LENGTH                  32
-#define TIMESTAMP_LENGTH                    4
-#define SEQUENCE_NUMBER_LENGTH              2
-#define REMAINING_PACKET_LEFT_LENGTH        2
-#define COMMANDS_LENGTH                     1
-
-#define HEADER_SIZE     (SC_CHECKSUM_LENGTH+TIMESTAMP_LENGTH+SEQUENCE_NUMBER_LENGTH+\
-                        REMAINING_PACKET_LEFT_LENGTH+COMMANDS_LENGTH)     
-                        
-#define DATA_LENGTH     (MAX_UDP_DATA_PACKET-HEADER_SIZE)                
-
-#define BYTE_SIZE   8
 
 
 
 // Used for parsing after receiving the packet
 class UDPPacket{
 public:
-    UDPPacket(const char *);
+    UDPPacket(char *);
     friend bool operator<(const UDPPacket& udp1,const UDPPacket& udp2);
 private:
     UPD_ENUM_COMMANDS command;
@@ -54,7 +41,7 @@ public:
     bool is_transmission_reached_to_end();
     
     // For receiving packets
-    void parse_UDPPacket(const char *);
+    void parse_UDPPacket(char *);
     bool is_full_message_received();
     
     
