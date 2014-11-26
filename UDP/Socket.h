@@ -17,7 +17,7 @@ MAX UDP PACKET IN IPv4 65507
 #include <string.h>
 #include <algorithm>
 
-#include "../Message.h"
+#include "../Payload/Message.h"
 #include "UDPPacket.h"
 
 class Socket {
@@ -25,7 +25,7 @@ class Socket {
 public:
 	Socket();
 	Socket(int); // port given as argument
-	status UDPsend(int s, Message *m, SocketAddress destination);
+	status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 	status UDPreceive(int s, Message *m, SocketAddress *origin);
 
 protected:

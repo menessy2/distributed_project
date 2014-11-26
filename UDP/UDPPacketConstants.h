@@ -8,6 +8,9 @@
 #ifndef UDPPACKETCONSTANTS_H
 #define	UDPPACKETCONSTANTS_H
 
+
+//      FOLLOWING NUMBERS ARE IN BYTES 
+
 #define MAX_UDP_DATA_PACKET                 65507
 
 #define SC_CHECKSUM_LENGTH                  32
@@ -15,13 +18,23 @@
 #define SEQUENCE_NUMBER_LENGTH              2
 #define REMAINING_PACKET_LEFT_LENGTH        2
 #define COMMANDS_LENGTH                     1
+#define WINDOW_LENGTH                       1
+#define TOTAL_MSG_SIZE_LENGTH               4   // can support up to 4.29497 GB file
+         
+
 
 #define HEADER_SIZE     (SC_CHECKSUM_LENGTH+TIMESTAMP_LENGTH+SEQUENCE_NUMBER_LENGTH+\
-                        REMAINING_PACKET_LEFT_LENGTH+COMMANDS_LENGTH)     
+                        REMAINING_PACKET_LEFT_LENGTH+COMMANDS_LENGTH+\
+                        TOTAL_MSG_SIZE_LENGTH+WINDOW_LENGTH)     
                         
 #define DATA_LENGTH     (MAX_UDP_DATA_PACKET-HEADER_SIZE)                
 
 #define BYTE_SIZE   8
+/////////////////////////////////////////////////////////////
+// PACKET CONFIGURATION PARAMETERS
 
+#define WINDOW_SIZE             10
+#define KEEP_ALIVE_CONSTANT     4                           // in seconds
+#define TIMEOUT_OF_REPLY        KEEP_ALIVE_CONSTANT + 5     // in seconds
 
 #endif	/* UDPPACKETCONSTANTS_H */

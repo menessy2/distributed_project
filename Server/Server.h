@@ -12,7 +12,7 @@
 
 
 #include "../UDP/Socket.h"
-#include "../Message.h"
+#include "../Payload/Message.h"
 #include "ThreadPool.h"
 #include "UserHandler.h"
 

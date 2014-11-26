@@ -5,7 +5,8 @@ CFLAGS=-c $(ADDIT)
 
 all: hello
 
-hello: main.o Message.o Security.o \
+hello: main.o Security.o 	\
+	Payload/Message.o	\
 	UDP/Socket.o UDP/UDPCommands.o UDP/UDPPacket.o \
 	Server/Server.o Server/ThreadPool.o Server/UserHandler.o  \
 	Client/Client.o
@@ -17,11 +18,11 @@ hello: main.o Message.o Security.o \
 main.o: main.cpp
 	$(CC) $(CFLAGS) main.cpp
 
-Message.o: Message.cpp Message.h
-	$(CC) $(CFLAGS) Message.cpp
-
 Security.o: Security.cpp
 	$(CC) $(CFLAGS) Security.cpp
+
+Message.o: Payload/Message.cpp Payload/Message.h
+	$(CC) $(CFLAGS) Payload/Message.cpp
 
 UDP/Socket.o: UDP/Socket.cpp UDP/Socket.h
 	$(CC) $(CFLAGS) UDP/Socket.cpp

@@ -5,7 +5,7 @@
 #include <cstring>
 #include <stdio.h>
 
-#include "UDP/UDPPacketConstants.h"
+#include "../UDP/UDPPacketConstants.h"
 
 class Message {
 

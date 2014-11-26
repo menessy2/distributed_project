@@ -7,11 +7,14 @@ bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
 
 ///////////////////////////////////////////////////////////////////////////////
 
+// Missing parts here
 UDPPacket::UDPPacket(char *packet){
     char *timestamp_START = const_cast<char *>(packet) + SC_CHECKSUM_LENGTH;
     char *sequence_number_START = timestamp_START + TIMESTAMP_LENGTH;
     char *remaining_packets_START = sequence_number_START + SEQUENCE_NUMBER_LENGTH;
     char *command_START = remaining_packets_START + COMMANDS_LENGTH;
+    char *window_size_START = command_START + COMMANDS_LENGTH;
+    char *total_message_size_START = window_size_START + WINDOW_LENGTH;
     
     char timestamp_array[TIMESTAMP_LENGTH+1];
     char sequence_number_array[SEQUENCE_NUMBER_LENGTH+1];
@@ -36,6 +39,7 @@ UDPPacketsHandler::UDPPacketsHandler(Message *rhs, UPD_ENUM_COMMANDS cmd) :
 msg(rhs), command(cmd), cursor(0), max_number_of_packets_to_receive(0) {
 
     starting_sequence_number = rand() % (1 << SEQUENCE_NUMBER_LENGTH*BYTE_SIZE);
+    total_msg_size = rhs->get_message_size();
 }
 
 UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd), 
@@ -52,10 +56,11 @@ bool UDPPacketsHandler::is_transmission_reached_to_end(){
     return ( cursor + 1 ) >= msg->get_message_size();
 }
 
-void UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
+UDPPacket UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
     UDPPacket packet = UDPPacket(bytes_array);
     
     packets_vector.push(packet);
+    return packet;
 }
 
 
@@ -90,7 +95,7 @@ void UDPPacketsHandler::set_sequence_number(char *buffer) {
 }
 
 void UDPPacketsHandler::set_remaining_packets(char *buffer) {
-    int remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
+    unsigned int remaining_packets = get_remaining_packets();
     sprintf (buffer, "%04x", remaining_packets);
 }
 
@@ -98,14 +103,43 @@ void UDPPacketsHandler::set_command(char *buffer){
     sprintf (buffer, "%02x", static_cast<int>(command) );
 }
 
+void UDPPacketsHandler::set_window_size(char *buffer){
+    unsigned int remaining_packets = get_remaining_packets();
+    if ( remaining_packets >= WINDOW_SIZE)
+        sprintf (buffer, "%02x", WINDOW_SIZE );
+    else
+        sprintf (buffer, "%02x", get_total_packets_number() % WINDOW_SIZE );
+}
+
+void UDPPacketsHandler::set_total_message_size(char *buffer){
+    sprintf (buffer, "%04x", total_msg_size);
+}
+
 void UDPPacketsHandler::construct_header(char *packet) {
     char *timestamp_START = packet + SC_CHECKSUM_LENGTH;
     char *sequence_number_START = timestamp_START + TIMESTAMP_LENGTH;
     char *remaining_packets_START = sequence_number_START + SEQUENCE_NUMBER_LENGTH;
-    char *command_START = remaining_packets_START + COMMANDS_LENGTH;
-
+    char *command_START = remaining_packets_START + REMAINING_PACKET_LEFT_LENGTH;
+    char *window_size_START = command_START + COMMANDS_LENGTH;
+    char *total_message_size_START = window_size_START + WINDOW_LENGTH;
+    
     set_timestamp(timestamp_START);
     set_sequence_number(sequence_number_START);
     set_remaining_packets(remaining_packets_START);
+    set_command(command_START);
+    set_window_size(window_size_START);
+    set_total_message_size(total_message_size_START);
 }
 
+
+
+unsigned int UDPPacketsHandler::get_remaining_packets(){
+    return (msg->get_message_size() - cursor) / DATA_LENGTH;
+}
+
+unsigned int UDPPacketsHandler::get_total_packets_number(){
+    unsigned int total_packets = total_msg_size / DATA_LENGTH;
+    if ( total_msg_size % DATA_LENGTH != 0 )
+        total_packets += 1;
+    return total_packets;
+}

@@ -4,10 +4,9 @@
 enum class UPD_ENUM_COMMANDS  {
     IDLE,
     TRANSMIT_DATA,
-    RETRANSMIT_REQUEST,
-    RETRANSMIT_REPLY,
+    RETRANSMIT,
+    ACK,
     PING,
-    AUTH,
 };
 
 /*

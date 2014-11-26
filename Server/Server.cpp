@@ -38,7 +38,7 @@ void Server::dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddr
         UserHandler *handler = &user_handlers[result];
         handler->notify_user_about_incomming_message(*received_pkt);
     } else {
-        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port));
+        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd,this);
         user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
                 user ) );
         user.initialize_thread(received_pkt);
@@ -78,7 +78,7 @@ int Server::wait_and_handle_clients(){
     Socket::UDPreceive(sockfd, &received_msg, &servaddr);
     //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
     
-    
+    /*
     incomming_requests->enqueue( [=](){
             received_msg.debug_print_msg();
             //tmp_msg.get_c_string();
@@ -86,7 +86,12 @@ int Server::wait_and_handle_clients(){
             SendReply(&received_msg,sockfd,servaddr);
         } 
     );
+    */
     
+    received_msg.debug_print_msg();
+            //tmp_msg.get_c_string();
+            dispatch_connection_to_UserHandler(&received_msg,servaddr);
+            SendReply(&received_msg,sockfd,servaddr);
           
     
     /*
