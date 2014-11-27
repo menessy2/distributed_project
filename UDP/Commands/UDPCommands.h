@@ -1,6 +1,8 @@
 #ifndef UDPCOMMANDS_H
 #define	UDPCOMMANDS_H
 
+#include <vector>
+
 enum class UPD_ENUM_COMMANDS  {
     IDLE,
     TRANSMIT_DATA,
@@ -14,9 +16,10 @@ class UDPCommands {
 public:
     UDPCommands() = 0;
     virtual ~UDPCommands() = 0;
-private:
+//private:
 
 };
-*/
+ */
+
 #endif	/* UDPCOMMANDS_H */
 

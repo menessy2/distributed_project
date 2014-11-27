@@ -25,7 +25,7 @@ class Socket {
 public:
 	Socket();
 	Socket(int); // port given as argument
-	status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+	static status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 	status UDPreceive(int s, Message *m, SocketAddress *origin);
 
 protected:

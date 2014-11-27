@@ -38,7 +38,7 @@ void Server::dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddr
         UserHandler *handler = &user_handlers[result];
         handler->notify_user_about_incomming_message(*received_pkt);
     } else {
-        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd,this);
+        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd);
         user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
                 user ) );
         user.initialize_thread(received_pkt);

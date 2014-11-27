@@ -14,13 +14,15 @@
 #include <chrono>
 
 #include "../UDP/UDPPacket.h"
+#include "../UDP/Socket.h"
+#include "../UDP/Commands/ACKCommand.h"
 #include "../Payload/Message.h"
 #include "../Misc/timer.h"
 
 class UserHandler  {
 public:
     UserHandler();
-    UserHandler(const char *client_ip,int port,SocketAddress sck,int sock,Server *server);
+    UserHandler(const char *client_ip,int port,SocketAddress sck,int sock);
     UserHandler(const UserHandler& rhs);
     void initialize_thread(const Message *msg);
     void notify_user_about_incomming_message(const Message &msg);
@@ -45,7 +47,8 @@ private:
     
     int sock_fd;
     SocketAddress destination;
-    Server *server_instance;
+    
+    // vector takes remaining packets as an element
     std::vector<unsigned int> packets_received_within_a_window;
     
     void refresh_keep_alive();

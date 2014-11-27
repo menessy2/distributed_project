@@ -37,13 +37,14 @@ Socket::Socket(int port)
 
 status Socket::UDPsend(int           s,
                        Message *     message,
-                       SocketAddress destination)
+                       SocketAddress destination,
+                        UPD_ENUM_COMMANDS cmd)
 {
     int n, accumulative = 0;
     char packet[MAX_UDP_DATA_PACKET+1];
     int actual_packet_size;
     
-    UDPPacketsHandler packetsHandler(message);
+    UDPPacketsHandler packetsHandler(message,cmd);
     
     while ( ! packetsHandler.is_transmission_reached_to_end() )
     {
@@ -54,7 +55,7 @@ status Socket::UDPsend(int           s,
                         sizeof(SocketAddress))) < 0)
         {
             perror("Send failed\n");
-            STATUS = BAD;
+            //STATUS = BAD;
         }
 
         //if (n != message -> get_message_size())
@@ -66,10 +67,10 @@ status Socket::UDPsend(int           s,
     //if (accumulative == message->get_message_size() && accumulative != 0)
     //{
         printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
-        STATUS = OK;
+        //STATUS = OK;
     //}
 
-    return STATUS;
+    return status::OK;
 }
 
 status Socket::UDPreceive(int             s,

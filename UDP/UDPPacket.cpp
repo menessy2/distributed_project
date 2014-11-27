@@ -6,8 +6,6 @@ bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-
-// Missing parts here
 UDPPacket::UDPPacket(char *packet){
     char *timestamp_START = const_cast<char *>(packet) + SC_CHECKSUM_LENGTH;
     char *sequence_number_START = timestamp_START + TIMESTAMP_LENGTH;
@@ -20,17 +18,23 @@ UDPPacket::UDPPacket(char *packet){
     char sequence_number_array[SEQUENCE_NUMBER_LENGTH+1];
     char remaining_packets_array[REMAINING_PACKET_LEFT_LENGTH+1];
     char command_array[COMMANDS_LENGTH+1];
+    char window_array[WINDOW_LENGTH+1];
+    char total_message_size_array[TOTAL_MSG_SIZE_LENGTH+1];
     
     memcpy(checksum,packet,SC_CHECKSUM_LENGTH);
     memcpy(timestamp_array,timestamp_START,TIMESTAMP_LENGTH);
     memcpy(sequence_number_array,sequence_number_START,SEQUENCE_NUMBER_LENGTH);
     memcpy(remaining_packets_array,remaining_packets_START,REMAINING_PACKET_LEFT_LENGTH);
     memcpy(command_array,command_START,COMMANDS_LENGTH);
+    memcpy(window_array,window_size_START,WINDOW_LENGTH);
+    memcpy(total_message_size_array,total_message_size_START,TOTAL_MSG_SIZE_LENGTH);
     
     command = static_cast<UPD_ENUM_COMMANDS>(atoi(command_array));
     sequence_number = atoi(sequence_number_array);
     remaining_packets = atoi(remaining_packets_array);
     timestamp = atol(timestamp_array);
+    window_size = atoi(window_array);
+    total_msg_filesize = atol(total_message_size_array);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

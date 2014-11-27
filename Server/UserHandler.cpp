@@ -3,8 +3,8 @@
 UserHandler::UserHandler(){}
 
 
-UserHandler::UserHandler(const char *client_ip,int port,SocketAddress sck_ad,int sock,Server *server) : 
-port(port), sock_fd(sock), destination(sck_ad), server_instance(server) {
+UserHandler::UserHandler(const char *client_ip,int port,SocketAddress sck_ad,int sock) : 
+port(port), sock_fd(sock), destination(sck_ad) /*, server_instance(server) */ {
     memcpy(connected_ip,client_ip,IPv4_SIZE);
     
 }
@@ -16,7 +16,7 @@ UserHandler::UserHandler(const UserHandler& rhs){
     port = rhs.port; 
     sock_fd = rhs.sock_fd;
     destination = rhs.destination;
-    server_instance = rhs.server_instance;
+    //server_instance = rhs.server_instance;
     //UDPPacketsHandler packets_handler;
 }
 
@@ -35,11 +35,16 @@ void UserHandler::initialize_thread(const Message *msg){
 void UserHandler::run_keep_alive_check(){
     Timer t;
     t.create(0, 1000,
-             []() {
+             [&]() {
                  auto current_time = std::chrono::system_clock::now();
-                 auto difference = std::chrono::duration_cast<std::chrono::seconds>(KEEP_ALIVE_CONSTANT);
+                 std::chrono::seconds sec(KEEP_ALIVE_CONSTANT);
+                 auto difference = std::chrono::duration_cast<std::chrono::seconds>(sec);
                  if ( ( current_time - keep_alive ) > difference ){
-                     
+                    ACKCommand ack;
+                    Message msg = ack.construct_packet(packets_received_within_a_window);
+                    Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
+                    window_counter = 0;
+                    packets_received_within_a_window.clear();
                  }
              });
 }
@@ -66,9 +71,13 @@ void UserHandler::loop(){
         Message msg = messages_vector.back();
         UDPPacket packet = packets_handler.parse_UDPPacket( msg.get_complete_data() );
         
+        packets_received_within_a_window.push_back(packet.get_remaining_packets());
         
-        if ( ( ++window_counter % NUMBER_OF_CHUNCKS_TO_ACK == 0) ) {
+        if ( ( ++window_counter % packet.get_window_size() == 0) ) {
             // send acknowledgment
+            ACKCommand ack;
+            Message msg = ack.construct_packet(packets_received_within_a_window);
+            Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
             window_counter = 0;
             packets_received_within_a_window.clear();
         }
@@ -82,8 +91,6 @@ void UserHandler::loop(){
         refresh_keep_alive();
         condition.wait(lock);
     }
-    
-    // server_instance->UDPsend(sock_fd,Message *message,destination,UPD_ENUM_COMMANDS::ACK);
     
     printf("Message was fully received: %s", packets_handler.get_data() );
 }

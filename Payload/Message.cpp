@@ -1,4 +1,6 @@
 
+#include <string>
+
 #include "Message.h"
 
 size_t Message::get_message_size()
@@ -16,6 +18,10 @@ void Message::set_string(char *str, size_t size){
 
 Message::Message() : size(0), data_array(nullptr)
 {
+}
+
+Message::Message(std::string& str){
+    set_string(str.c_str(),str.length());
 }
 
 char *Message::get_data_without_header(){

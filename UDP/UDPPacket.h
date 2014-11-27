@@ -6,7 +6,7 @@
 #include <string>
 
 #include "../Payload/Message.h"
-#include "UDPCommands.h"
+#include "Commands/UDPCommands.h"
 #include "UDPPacketConstants.h"
 
 
@@ -15,10 +15,14 @@ class UDPPacket{
 public:
     UDPPacket(char *);
     friend bool operator<(const UDPPacket& udp1,const UDPPacket& udp2);
+    unsigned int get_window_size() { return window_size; }
+    unsigned int get_total_message_size() { return total_msg_filesize; }
+    unsigned short get_remaining_packets()  { return remaining_packets; }
+    
 private:
     UPD_ENUM_COMMANDS command;
     unsigned short sequence_number;
-    short remaining_packets;
+    unsigned short remaining_packets;
     unsigned long int timestamp;
     char checksum[SC_CHECKSUM_LENGTH+1];
     std::string data;
