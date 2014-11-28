@@ -4,6 +4,7 @@
 #include <sys/time.h>
 #include <queue>
 #include <string>
+#include <stdint.h>
 
 #include "../Payload/Message.h"
 #include "Commands/UDPCommands.h"
@@ -18,15 +19,19 @@ public:
     unsigned int get_window_size() { return window_size; }
     unsigned int get_total_message_size() { return total_msg_filesize; }
     unsigned short get_remaining_packets()  { return remaining_packets; }
+    std::string get_data() { return data; }
+    
+    template <typename IntegerType>
+    IntegerType bitsToInt(IntegerType& result, const unsigned char* bits, bool little_endian = false );
     
 private:
     UPD_ENUM_COMMANDS command;
-    unsigned short sequence_number;
-    unsigned short remaining_packets;
-    unsigned long int timestamp;
-    char checksum[SC_CHECKSUM_LENGTH+1];
+    unsigned int sequence_number;
+    unsigned int remaining_packets;
+    unsigned int timestamp;
+    char checksum[SC_CHECKSUM_LENGTH];
     std::string data;
-    unsigned int window_size;
+    uint8_t window_size;
     unsigned int total_msg_filesize;
 };
 
@@ -49,7 +54,7 @@ public:
     
 private:
     size_t cursor;        // represents the position from which the handler will start read from 
-    unsigned short starting_sequence_number;
+    unsigned int starting_sequence_number;
     Message *msg;
     unsigned int max_number_of_packets_to_receive;
     UPD_ENUM_COMMANDS command;
@@ -68,6 +73,8 @@ private:
     
     unsigned int get_remaining_packets();
     unsigned int get_total_packets_number();
+    
+    void convert_int_to_bytes(unsigned int n, unsigned char* buffer);
 
 };
 

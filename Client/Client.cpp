@@ -21,7 +21,7 @@ status Client::DoOperation(Message *     message,
                            int           s,
                            SocketAddress serverSA)
 {
-    status request_status = Socket::UDPsend(s, message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+    status request_status = Socket::UDPsend_ACK_support(s, message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
     status reply_status   = Socket::UDPreceive(s, reply, &originSA);
 
     close(s);

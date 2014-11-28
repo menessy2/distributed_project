@@ -15,8 +15,8 @@
 
 #define SC_CHECKSUM_LENGTH                  32
 #define TIMESTAMP_LENGTH                    4
-#define SEQUENCE_NUMBER_LENGTH              2
-#define REMAINING_PACKET_LEFT_LENGTH        2
+#define SEQUENCE_NUMBER_LENGTH              4
+#define REMAINING_PACKET_LEFT_LENGTH        4
 #define COMMANDS_LENGTH                     1
 #define WINDOW_LENGTH                       1
 #define TOTAL_MSG_SIZE_LENGTH               4   // can support up to 4.29497 GB file

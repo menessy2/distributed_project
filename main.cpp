@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "Client/Client.h"
 #include "Server/Server.h"
-#include "Message.h"
+#include "Payload/Message.h"
 
 #define NUMBER_THREADPOOL 4
 

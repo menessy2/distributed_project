@@ -23,7 +23,7 @@ public:
     char *get_complete_data();
     char *get_data_without_header();
     void debug_print_msg();
-    
+    void print_header();
 
 private:
     size_t size;    

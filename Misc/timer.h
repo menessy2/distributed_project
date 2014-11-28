@@ -7,15 +7,15 @@ COPIED FROM : http://codereview.stackexchange.com/questions/40473/portable-perio
 #ifndef TIMER_H
 #define TIMER_H
 
-#include <thread>
-#include <mutex>
-#include <condition_variable>
 #include <algorithm>
-#include <functional>
 #include <chrono>
 #include <unordered_map>
 #include <set>
 #include <cstdint>
+#include <stdint.h>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 
 class Timer
 {

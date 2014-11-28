@@ -16,8 +16,10 @@ MAX UDP PACKET IN IPv4 65507
 #include <stdlib.h> 
 #include <string.h>
 #include <algorithm>
+#include <set>
 
 #include "../Payload/Message.h"
+#include "Commands/ACKCommand.h"
 #include "UDPPacket.h"
 
 class Socket {
@@ -26,6 +28,7 @@ public:
 	Socket();
 	Socket(int); // port given as argument
 	static status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+        status UDPsend_ACK_support(int s, Message *message, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 	status UDPreceive(int s, Message *m, SocketAddress *origin);
 
 protected:

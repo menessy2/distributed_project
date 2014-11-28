@@ -41,7 +41,7 @@ void UserHandler::run_keep_alive_check(){
                  auto difference = std::chrono::duration_cast<std::chrono::seconds>(sec);
                  if ( ( current_time - keep_alive ) > difference ){
                     ACKCommand ack;
-                    Message msg = ack.construct_packet(packets_received_within_a_window);
+                    Message msg = ack.construct_packet(&packets_received_within_a_window);
                     Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
                     window_counter = 0;
                     packets_received_within_a_window.clear();
@@ -76,7 +76,7 @@ void UserHandler::loop(){
         if ( ( ++window_counter % packet.get_window_size() == 0) ) {
             // send acknowledgment
             ACKCommand ack;
-            Message msg = ack.construct_packet(packets_received_within_a_window);
+            Message msg = ack.construct_packet(&packets_received_within_a_window);
             Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
             window_counter = 0;
             packets_received_within_a_window.clear();

@@ -89,6 +89,7 @@ int Server::wait_and_handle_clients(){
     */
     
     received_msg.debug_print_msg();
+    received_msg.print_header();
             //tmp_msg.get_c_string();
             dispatch_connection_to_UserHandler(&received_msg,servaddr);
             SendReply(&received_msg,sockfd,servaddr);

@@ -44,7 +44,7 @@ status Socket::UDPsend(int           s,
     char packet[MAX_UDP_DATA_PACKET+1];
     int actual_packet_size;
     
-    UDPPacketsHandler packetsHandler(message,cmd);
+    UDPPacketsHandler packetsHandler(message,cmd);      // make a new sequence number : to be changed
     
     while ( ! packetsHandler.is_transmission_reached_to_end() )
     {
@@ -72,6 +72,60 @@ status Socket::UDPsend(int           s,
 
     return status::OK;
 }
+
+status UDPsend_ACK_support(int s, 
+                                    Message *message, 
+                                    SocketAddress destination,
+                                    UPD_ENUM_COMMANDS cmd){
+    int n, accumulative = 0;
+    char packet[MAX_UDP_DATA_PACKET+1];
+    int actual_packet_size;
+    unsigned int window_counter = 0;
+    
+    UDPPacketsHandler packetsHandler(message,cmd);      // make a new sequence number : to be changed
+    std::set<unsigned int> sent_packets,received_packets,result;
+    
+    while ( ! packetsHandler.is_transmission_reached_to_end() )
+    {
+        UDPPacket udp_packet;
+        do {
+            bzero(packet, MAX_UDP_DATA_PACKET);
+            packetsHandler.get_next_packet(packet,actual_packet_size);
+
+            if ((n = sendto(s, packet, actual_packet_size, 0, (struct sockaddr*) &destination,
+                            sizeof(SocketAddress))) < 0)
+            {
+                perror("Send failed\n");
+                return status::BAD;
+            }
+            
+            udp_packet = packetsHandler.parse_UDPPacket( packet );
+            sent_packets.insert(udp_packet.get_remaining_packets());
+            
+        } while ( ++window_counter % udp_packet.get_window_size() != 0 );
+
+        Message expected_Ack;
+        UDPreceive(s, &expected_Ack, &destination);
+        ACKCommand ack;
+        received_packets = ack.parse_packet(&expected_Ack);
+        std::set_difference( sent_packets.begin(), sent_packets.end(), received_packets.begin(), received_packets.end(), std::inserter(result, result.begin()));
+        
+        
+        sent_packets.clear();
+        received_packets.clear();
+        result.clear();
+        accumulative += n;
+    }
+
+    //if (accumulative == message->get_message_size() && accumulative != 0)
+    //{
+        printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
+        //STATUS = OK;
+    //}
+
+    return status::OK;
+}
+
 
 status Socket::UDPreceive(int             s,
                           Message *       m,

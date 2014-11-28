@@ -39,6 +39,13 @@ void Message::debug_print_msg(){
     printf("\n");
 }
 
+void Message::print_header(){
+    for(int i=0;i<HEADER_SIZE;i++){
+        printf("%02x",data_array[i]);
+    }
+    printf("\n");
+}
+
 Message::Message(const Message& msg){
     set_string(msg.data_array,msg.size);
 }
