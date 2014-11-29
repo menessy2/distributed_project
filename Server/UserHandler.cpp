@@ -28,13 +28,16 @@ void UserHandler::initialize_thread(const Message *msg){
     window_counter = 0;
     refresh_keep_alive();
     run_keep_alive_check();
+    
+    UDPPacket packet(msg->get_complete_data());
+    packets_handler.set_total_msg_size(packet.get_total_msg_size());
+    
     loop();
 }
 
 // the Check occurs every one second
 void UserHandler::run_keep_alive_check(){
-    Timer t;
-    t.create(0, 1000,
+    keep_alive_periodic_checker.create(0, 1000,
              [&]() {
                  auto current_time = std::chrono::system_clock::now();
                  std::chrono::seconds sec(KEEP_ALIVE_CONSTANT);
@@ -58,15 +61,15 @@ int UserHandler::get_port(){
     return port;
 }
 
-void UserHandler::notify_user_about_incomming_message(const Message &msg){
+void UserHandler::notify_user_about_incomming_message(const Message msg){
     messages_vector.push_back(msg);
     condition.notify_one();
 }
 
 void UserHandler::loop(){
-    
     std::unique_lock<std::mutex> lock(queue_mutex);
-    while( true ){
+    //condition.wait(lock);
+    while( ! messages_vector.empty() ){
         
         Message msg = messages_vector.back();
         UDPPacket packet = packets_handler.parse_UDPPacket( msg.get_complete_data() );
@@ -77,7 +80,7 @@ void UserHandler::loop(){
             // send acknowledgment
             ACKCommand ack;
             Message msg = ack.construct_packet(&packets_received_within_a_window);
-            Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
+            Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK_SUCCESS);
             window_counter = 0;
             packets_received_within_a_window.clear();
         }
@@ -89,12 +92,16 @@ void UserHandler::loop(){
             break;
         
         refresh_keep_alive();
-        condition.wait(lock);
+        //condition.wait(lock);
     }
     
-    printf("Message was fully received: %s", packets_handler.get_data() );
+    printf("Message was fully received: %s\n\n", packets_handler.get_whole_received_data().c_str() );
 }
 
+
+std::string UserHandler::get_whole_data(){
+    return packets_handler.get_whole_received_data();
+}
 
 void UserHandler::refresh_keep_alive(){
     keep_alive = std::chrono::system_clock::now();

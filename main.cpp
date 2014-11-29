@@ -4,7 +4,7 @@
 #include "Server/Server.h"
 #include "Payload/Message.h"
 
-#define NUMBER_THREADPOOL 4
+#define NUMBER_THREADPOOL 2
 
 using namespace std;
 
@@ -43,10 +43,7 @@ int main(int argc,char ** argv)
         Server s;
         s.set_ThreadPool_size(NUMBER_THREADPOOL);
         
-        for (;;){
-             if ( s.wait_and_handle_clients() == -1 )
-                 exit(-1);
-        }
+        s.wait_and_handle_clients();
     }
     else
     {

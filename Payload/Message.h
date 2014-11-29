@@ -12,7 +12,7 @@ class Message {
 public:
     Message();
     Message(const Message& msg);
-    Message(std::string& str);
+    Message(std::string str);
     ~Message();
     Message(char *m,size_t size);
     size_t get_message_size();

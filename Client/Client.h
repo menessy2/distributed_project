@@ -2,6 +2,13 @@
 #define CLIENT_H
 
 #include <stdio.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+
+
+#include "../Server/UserHandler.h"
+#include "ServerHandler.h"
 #include "../UDP/Socket.h"
 
 class Client: public Socket {

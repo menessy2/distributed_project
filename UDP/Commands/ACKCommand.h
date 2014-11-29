@@ -1,8 +1,9 @@
 #ifndef ACKCOMMAND_H
 #define ACKCOMMAND_H
 
+#include <iostream>
 #include <vector>
-#include <string>
+#include <string.h>
 #include <sstream>
 #include <set>
 

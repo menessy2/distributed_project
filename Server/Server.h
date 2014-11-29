@@ -26,13 +26,15 @@ public:
         void dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddress sck);
 	status GetRequest (Message *callMessage, int s, SocketAddress *clientSA);
 	status SendReply  (Message *replyMessage, int s, SocketAddress clientSA);
+        void doReaction(SocketAddress sck,int sockfd);
 
 private:
 	void makeReceiverSA(SocketAddress *sa, unsigned short port=0);
         Socket *mysock;
-        ThreadPool *outgoing_responses;
+        //ThreadPool *outgoing_responses;
         ThreadPool *incomming_requests;
         std::map<std::string, UserHandler> user_handlers;
+        std::mutex mutex_for_dispatcher;
 };
 
 #endif

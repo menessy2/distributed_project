@@ -20,6 +20,7 @@ public:
     unsigned int get_total_message_size() { return total_msg_filesize; }
     unsigned short get_remaining_packets()  { return remaining_packets; }
     std::string get_data() { return data; }
+    unsigned int get_total_msg_size() { return total_msg_filesize; }
     
     template <typename IntegerType>
     IntegerType bitsToInt(IntegerType& result, const unsigned char* bits, bool little_endian = false );
@@ -41,16 +42,17 @@ class UDPPacketsHandler {
 public:
     UDPPacketsHandler(Message *rhs,UPD_ENUM_COMMANDS command);
     UDPPacketsHandler(UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::IDLE);
-    const char *get_data();
+    std::string get_whole_received_data();
+    void set_total_msg_size(unsigned int size);
     
     // For sending packets
     void get_next_packet(char *packet,int &size);
+    void get_specific_packet(char *packet,int &size,unsigned int packetID);
     bool is_transmission_reached_to_end();
     
     // For receiving packets
     UDPPacket parse_UDPPacket(char *);
     bool is_full_message_received();
-    
     
 private:
     size_t cursor;        // represents the position from which the handler will start read from 
@@ -63,11 +65,11 @@ private:
     // For receiving packets
     std::priority_queue<UDPPacket> packets_vector;
     
-    void construct_header(char *packet);
+    void construct_header(char *packet,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::NA);
     void set_timestamp(char *buffer);
     void set_sequence_number(char *buffer);
     void set_remaining_packets(char *buffer);
-    void set_command(char *buffer);
+    void set_command(char *buffer,UPD_ENUM_COMMANDS cmd);
     void set_window_size(char *buffer);
     void set_total_message_size(char *buffer);
     

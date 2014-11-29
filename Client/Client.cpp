@@ -21,9 +21,20 @@ status Client::DoOperation(Message *     message,
                            int           s,
                            SocketAddress serverSA)
 {
+    //ServerHandler handler;
+    
     status request_status = Socket::UDPsend_ACK_support(s, message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+    //status reply_status   = Socket::UDPreceive(s, reply, &originSA);
+    std::string ip = std::string(inet_ntoa(serverSA.sin_addr));
+    UserHandler user = UserHandler(ip.c_str(),ntohs(serverSA.sin_port),serverSA,s);
     status reply_status   = Socket::UDPreceive(s, reply, &originSA);
-
+    user.initialize_thread(reply);
+    
+    printf("Whole message received from client: %s",user.get_whole_data().c_str());
+    
+    std::string data = user.get_whole_data();
+    reply = &Message(data);
+    
     close(s);
 
     return reply_status;

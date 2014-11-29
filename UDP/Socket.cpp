@@ -73,7 +73,7 @@ status Socket::UDPsend(int           s,
     return status::OK;
 }
 
-status UDPsend_ACK_support(int s, 
+status Socket::UDPsend_ACK_support(int s, 
                                     Message *message, 
                                     SocketAddress destination,
                                     UPD_ENUM_COMMANDS cmd){
@@ -87,7 +87,6 @@ status UDPsend_ACK_support(int s,
     
     while ( ! packetsHandler.is_transmission_reached_to_end() )
     {
-        UDPPacket udp_packet;
         do {
             bzero(packet, MAX_UDP_DATA_PACKET);
             packetsHandler.get_next_packet(packet,actual_packet_size);
@@ -99,17 +98,24 @@ status UDPsend_ACK_support(int s,
                 return status::BAD;
             }
             
-            udp_packet = packetsHandler.parse_UDPPacket( packet );
+            UDPPacket udp_packet( packet );
             sent_packets.insert(udp_packet.get_remaining_packets());
             
-        } while ( ++window_counter % udp_packet.get_window_size() != 0 );
+            if ( ( ++window_counter % udp_packet.get_window_size() ) == 0 )
+                break;
+            
+        } while ( true );
 
         Message expected_Ack;
-        UDPreceive(s, &expected_Ack, &destination);
+        Socket::UDPreceive(s, &expected_Ack, &destination);
         ACKCommand ack;
-        received_packets = ack.parse_packet(&expected_Ack);
+        received_packets = ack.parse_packet(expected_Ack.get_complete_data());
         std::set_difference( sent_packets.begin(), sent_packets.end(), received_packets.begin(), received_packets.end(), std::inserter(result, result.begin()));
-        
+        for( auto& packet_id : result){
+            int size;
+            packetsHandler.get_specific_packet(packet,size,packet_id);
+            Socket::raw_UDPsent(s, packet, size, destination);
+        }
         
         sent_packets.clear();
         received_packets.clear();
@@ -123,6 +129,19 @@ status UDPsend_ACK_support(int s,
         //STATUS = OK;
     //}
 
+    return status::OK;
+}
+
+
+status Socket::raw_UDPsent(int s, char *packet, int size, SocketAddress destination){
+    int n;
+    if ((n = sendto(s, packet, size, 0, (struct sockaddr*) &destination,
+                       sizeof(SocketAddress))) < 0)
+       {
+           perror("Send failed\n");
+           return status::BAD;
+       }
+    
     return status::OK;
 }
 
@@ -141,17 +160,16 @@ status Socket::UDPreceive(int             s,
                      (struct sockaddr*) origin, &length_received_msg))  < 0)
     {
         perror("Error on Receiving");
-        STATUS = BAD;
+        return status::BAD;
     }
     else
     {
         received_message[n] = '\0';
         //printf("Received Message: ( %s ), length = %d\n", received_message, n);
-        STATUS = OK;
     }
     
     m->set_string(received_message,n);
-    return STATUS;
+    return status::OK;
 }
 
 void Socket::makeLocalSA(SocketAddress * sa,

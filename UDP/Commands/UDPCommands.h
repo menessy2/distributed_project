@@ -4,10 +4,12 @@
 #include <vector>
 
 enum class UPD_ENUM_COMMANDS  {
-    IDLE,
+    NA,                     // UNINITIALIZED
+    IDLE,                   // FOR RECEPIENTS
     TRANSMIT_DATA,
     RETRANSMIT,
     ACK,
+    ACK_SUCCESS,
     PING,
 };
 

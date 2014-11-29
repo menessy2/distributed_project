@@ -20,7 +20,7 @@ Message::Message() : size(0), data_array(nullptr)
 {
 }
 
-Message::Message(std::string& str){
+Message::Message(std::string str){
     set_string(str.c_str(),str.length());
 }
 

@@ -11,7 +11,7 @@
 
 //      FOLLOWING NUMBERS ARE IN BYTES 
 
-#define MAX_UDP_DATA_PACKET                 65507
+#define MAX_UDP_DATA_PACKET                 100//65507
 
 #define SC_CHECKSUM_LENGTH                  32
 #define TIMESTAMP_LENGTH                    4
