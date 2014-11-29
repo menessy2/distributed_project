@@ -118,9 +118,10 @@ UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd),
 
 std::string UDPPacketsHandler::get_whole_received_data(){
     std::string temp="";
-    while(!packets_vector.empty()) {
-        temp += packets_vector.top().get_data();
-        packets_vector.pop();
+    std::priority_queue<UDPPacket> temp_pq = packets_vector;
+    while(!temp_pq.empty()) {
+        temp += temp_pq.top().get_data();
+        temp_pq.pop();
     }
     return temp;
 }

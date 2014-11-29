@@ -28,7 +28,7 @@ status Client::DoOperation(Message *     message,
     std::string ip = std::string(inet_ntoa(serverSA.sin_addr));
     UserHandler user = UserHandler(ip.c_str(),ntohs(serverSA.sin_port),serverSA,s);
     status reply_status   = Socket::UDPreceive(s, reply, &originSA);
-    user.initialize_thread(reply);
+    user.initialize_thread(*reply,false);
     
     printf("Whole message received from client: %s",user.get_whole_data().c_str());
     

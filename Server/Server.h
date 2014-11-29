@@ -33,8 +33,8 @@ private:
         Socket *mysock;
         //ThreadPool *outgoing_responses;
         ThreadPool *incomming_requests;
-        std::map<std::string, UserHandler> user_handlers;
-        std::mutex mutex_for_dispatcher;
+        std::map<std::string, UserHandler*> user_handlers;
+        //std::mutex mutex_for_dispatcher;
 };
 
 #endif

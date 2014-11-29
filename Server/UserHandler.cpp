@@ -16,6 +16,7 @@ UserHandler::UserHandler(const UserHandler& rhs){
     port = rhs.port; 
     sock_fd = rhs.sock_fd;
     destination = rhs.destination;
+    isServer = rhs.isServer;
     //server_instance = rhs.server_instance;
     //UDPPacketsHandler packets_handler;
 }
@@ -23,13 +24,15 @@ UserHandler::UserHandler(const UserHandler& rhs){
 UserHandler::~UserHandler() {
 }
 
-void UserHandler::initialize_thread(const Message *msg){
-    messages_vector.push_back(*msg);
+void UserHandler::initialize_thread(Message msg,bool is_server){
+    msg.debug_print_msg();
+    messages_vector.push_back(msg);
+    isServer = true;
     window_counter = 0;
     refresh_keep_alive();
     run_keep_alive_check();
     
-    UDPPacket packet(msg->get_complete_data());
+    UDPPacket packet(msg.get_complete_data());
     packets_handler.set_total_msg_size(packet.get_total_msg_size());
     
     loop();
@@ -63,15 +66,19 @@ int UserHandler::get_port(){
 
 void UserHandler::notify_user_about_incomming_message(const Message msg){
     messages_vector.push_back(msg);
-    condition.notify_one();
+    //condition.notify_one();
 }
 
 void UserHandler::loop(){
-    std::unique_lock<std::mutex> lock(queue_mutex);
+    //std::unique_lock<std::mutex> lock(queue_mutex);
     //condition.wait(lock);
-    while( ! messages_vector.empty() ){
+    while( true ){
+        
+        while ( messages_vector.empty() );
         
         Message msg = messages_vector.back();
+        printf("in USERHANDLER:\n");
+        msg.debug_print_msg();
         UDPPacket packet = packets_handler.parse_UDPPacket( msg.get_complete_data() );
         
         packets_received_within_a_window.push_back(packet.get_remaining_packets());
@@ -95,7 +102,11 @@ void UserHandler::loop(){
         //condition.wait(lock);
     }
     
+    Message msg(get_whole_data());
     printf("Message was fully received: %s\n\n", packets_handler.get_whole_received_data().c_str() );
+    
+    if ( isServer )
+        Socket::UDPsend_ACK_support(sock_fd, &msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 }
 
 

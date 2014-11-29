@@ -31,18 +31,23 @@ void Server::set_ThreadPool_size(size_t threads_size){
 }
 
 void Server::dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddress sck){
-    std::lock_guard<std::mutex> lock(mutex_for_dispatcher);
+    //std::lock_guard<std::mutex> lock(mutex_for_dispatcher);
     std::string ip = std::string(inet_ntoa(sck.sin_addr));
     std::string port = std::to_string(ntohs(sck.sin_port));
     std::string result = ip+":"+port;
     if ( user_handlers.count(result) > 0 ){
-        UserHandler *handler = &user_handlers[result];
+        UserHandler *handler = user_handlers[result];
         handler->notify_user_about_incomming_message(*received_pkt);
     } else {
-        UserHandler user = UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd);
-        user_handlers.insert( std::pair<const char*,UserHandler>(result.c_str(),
+        UserHandler *user = new UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd);
+        user_handlers.insert( std::pair<const char*,UserHandler*>(result.c_str(),
                 user ) );
-        user.initialize_thread(received_pkt);
+        incomming_requests->enqueue( [&](){
+            received_pkt->debug_print_msg();
+            user->initialize_thread(*received_pkt,true);
+        });
+        //new std::thread(&UserHandler::initialize_thread, user, received_pkt);
+        
     }
     
 }
@@ -51,7 +56,7 @@ void Server::doReaction(SocketAddress sck,int sockfd){
     std::string ip = std::string(inet_ntoa(sck.sin_addr));
     std::string port = std::to_string(ntohs(sck.sin_port));
     std::string result = ip+":"+port;
-    UserHandler *handler = &user_handlers[result];
+    UserHandler *handler = user_handlers[result];
     Message msg(handler->get_whole_data());
     Socket::UDPsend_ACK_support(sockfd, &msg, sck,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 }
@@ -87,21 +92,20 @@ int Server::wait_and_handle_clients(){
     while( true ){
         Message received_msg;
         Socket::UDPreceive(sockfd, &received_msg, &servaddr);
-        //dispatch_connection_to_UserHandler(received_msg.get_c_string(),servaddr);
-
+        
+        dispatch_connection_to_UserHandler(&received_msg,servaddr);
+        
+        //new std::thread(&Server::dispatch_connection_to_UserHandler, this, &received_msg,servaddr);
         /*
         incomming_requests->enqueue( [=](){
                 received_msg.debug_print_msg();
                 //tmp_msg.get_c_string();
                 dispatch_connection_to_UserHandler(&received_msg,servaddr);
-                doReaction(servaddr,sockfd);
+                //doReaction(servaddr,sockfd);
                 //SendReply(&received_msg,sockfd,servaddr);
             } 
-        );*/
-        received_msg.debug_print_msg();
-        //tmp_msg.get_c_string();
-        dispatch_connection_to_UserHandler(&received_msg,servaddr);
-        doReaction(servaddr,sockfd);
+        );
+         */
     }
     
    

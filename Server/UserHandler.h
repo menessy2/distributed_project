@@ -24,7 +24,7 @@ public:
     UserHandler();
     UserHandler(const char *client_ip,int port,SocketAddress sck,int sock);
     UserHandler(const UserHandler& rhs);
-    void initialize_thread(const Message *msg);
+    void initialize_thread(Message msg,bool is_server);
     void notify_user_about_incomming_message(const Message msg);
     virtual ~UserHandler();
     void set_port(int _port);
@@ -49,6 +49,7 @@ private:
     int sock_fd;
     SocketAddress destination;
     Timer keep_alive_periodic_checker;
+    bool isServer;
     
     // vector takes remaining packets as an element
     std::vector<unsigned int> packets_received_within_a_window;
