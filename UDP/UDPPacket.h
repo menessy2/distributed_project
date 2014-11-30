@@ -52,7 +52,7 @@ public:
     
     // For sending packets
     void get_next_packet(char *packet,int &size);
-    void get_specific_packet(char *packet,int &size,unsigned int packetID);
+    void get_specific_packet(char *packet,unsigned int &size,unsigned int packetID);
     bool is_transmission_reached_to_end();
     
     // For receiving packets

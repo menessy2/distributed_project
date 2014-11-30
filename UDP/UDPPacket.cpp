@@ -79,8 +79,16 @@ UDPPacket::UDPPacket(char *packet){
     total_msg_filesize = bitsToInt<unsigned int>(total_msg_filesize, total_message_size_array);
     
     data = "";
-    for ( int i=0; ( i < DATA_LENGTH ) && isalnum(data_ptr[i]) ;i++){
-        data += data_ptr[i];
+    
+    if ( remaining_packets >= 1){
+        for ( int i=0; i < DATA_LENGTH ;i++){
+            data += data_ptr[i];
+        }
+    }
+    else{
+        for ( int i=0; i < total_msg_filesize % DATA_LENGTH ;i++){
+            data += data_ptr[i];
+        }
     }
     
     //data = std::string(data_ptr);
@@ -175,9 +183,11 @@ void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
     delete buffer;
 }
 
-void UDPPacketsHandler::get_specific_packet(char *packet,int &size,unsigned int packetID){
-    unsigned int start = packetID*DATA_LENGTH;
-    size = std::min(start+DATA_LENGTH,msg->get_message_size());
+void UDPPacketsHandler::get_specific_packet(char *packet,unsigned int &size,unsigned int packetID){
+    construct_header(packet,UPD_ENUM_COMMANDS::RETRANSMIT);
+    unsigned int start = ( get_total_packets_number() - packetID) * DATA_LENGTH;
+    int temp = (unsigned int)msg->get_message_size()-start;
+    size = std::min(DATA_LENGTH,temp);
     char *buffer = new char[size];
     msg->split_string(start, size, buffer);
     memcpy(packet+HEADER_SIZE, buffer ,size);
@@ -216,8 +226,9 @@ void UDPPacketsHandler::set_command(char *buffer,UPD_ENUM_COMMANDS cmd){
 
 void UDPPacketsHandler::set_window_size(char *buffer){
     unsigned int remaining_packets = get_remaining_packets();
-    if ( remaining_packets >= WINDOW_SIZE || 
-            ( get_total_packets_number() - remaining_packets ) < WINDOW_SIZE )
+    if ( remaining_packets >= WINDOW_SIZE )
+        buffer[0] = (unsigned char) static_cast<uint8_t>(WINDOW_SIZE);
+    else if ( ( get_total_packets_number() % WINDOW_SIZE ) == 0 )
         buffer[0] = (unsigned char) static_cast<uint8_t>(WINDOW_SIZE);
     else
         buffer[0] = (unsigned char) static_cast<uint8_t>((get_total_packets_number() % WINDOW_SIZE ));

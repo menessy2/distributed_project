@@ -74,7 +74,7 @@ status Socket::UDPsend(int           s,
 }
 
 status Socket::UDPsend_ACK_support(int s, 
-                                    Message *message, 
+                                    Message message, 
                                     SocketAddress destination,
                                     UPD_ENUM_COMMANDS cmd){
     int n;
@@ -82,7 +82,7 @@ status Socket::UDPsend_ACK_support(int s,
     int actual_packet_size;
     unsigned int window_counter = 0;
     
-    packetsHandler = new UDPPacketsHandler(message,cmd);      // make a new sequence number : to be changed
+    packetsHandler = new UDPPacketsHandler(&message,cmd);      // make a new sequence number : to be changed
     
     //packetsHandler.set_command(cmd);
     //packetsHandler.set_message(message);
@@ -119,7 +119,7 @@ status Socket::UDPsend_ACK_support(int s,
         
     }
     
-    printf("\nMessage was sent successfully:  %d bytes\n", message->get_message_size());
+    printf("\nMessage was sent successfully:  %d bytes\n", message.get_message_size());
 
     return status::OK;
 }

@@ -16,17 +16,17 @@ status Client::echo_reply_Message(Message *      message,
     return DoOperation(message, reply, s, destinationSA);
 }
 
-void Client::handle_Acks(char *packet_bytes,SocketAddress destination){
+void Client::handle_Acks(char *packet_bytes,SocketAddress destination,int sock){
     std::set<unsigned int> result;
     char packet[MAX_UDP_DATA_PACKET];
     ACKCommand ack;
     received_packets = ack.parse_packet(packet_bytes);
     std::set_difference( sent_packets.begin(), sent_packets.end(), received_packets.begin(), received_packets.end(), std::inserter(result, result.begin()));
     for( auto& packet_id : result){
-        int size;
+        unsigned int size;
         bzero(packet, MAX_UDP_DATA_PACKET);
         packetsHandler->get_specific_packet(packet,size,packet_id);
-        Socket::raw_UDPsent(s, packet, size, destination);
+        Socket::raw_UDPsent(sock, packet, size, destination);
     }
 }
 
@@ -38,20 +38,20 @@ status Client::DoOperation(Message *     message,
     //ServerHandler handler;
     
     //status request_status = Socket::UDPsend_ACK_support(s, message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
-    new std::thread(&Socket::UDPsend_ACK_support, this, s, message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+    std::thread *t = new std::thread(&Socket::UDPsend_ACK_support, this, s, *message, serverSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
     //status reply_status   = Socket::UDPreceive(s, reply, &originSA);
     
     
     
     while ( true ) { 
         Message expected_Ack;
-        Socket::UDPreceive(s, &expected_Ack, &originSA);
+        Socket::UDPreceive(s, &expected_Ack, &serverSA);
     
         UDPPacket packet(expected_Ack.get_complete_data());
         
         switch( packet.get_command() ){
             case UPD_ENUM_COMMANDS::ACK:
-                handle_Acks(expected_Ack.get_complete_data(),serverSA);
+                handle_Acks(expected_Ack.get_complete_data(),serverSA,s);
                 break;
             case UPD_ENUM_COMMANDS::ACK_SUCCESS:
                 condition.notify_one();   // continue transmission with the new bulk of the window 
@@ -61,7 +61,7 @@ status Client::DoOperation(Message *     message,
         
     }
         
-    
+    t->join();
     /*
     std::string ip = std::string(inet_ntoa(serverSA.sin_addr));
     UserHandler user = UserHandler(ip.c_str(),ntohs(serverSA.sin_port),serverSA,s);

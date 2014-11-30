@@ -59,7 +59,7 @@ void Server::doReaction(SocketAddress sck,int sockfd){
     std::string result = ip+":"+port;
     UserHandler *handler = user_handlers[result];
     Message msg(handler->get_whole_data());
-    Socket::UDPsend_ACK_support(sockfd, &msg, sck,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+    Socket::UDPsend_ACK_support(sockfd, msg, sck,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 }
 
 status Server::GetRequest(Message *       callMessage,
@@ -78,7 +78,7 @@ void Server::makeReceiverSA(SocketAddress * sa,
                             unsigned short  port)
 {
     sa -> sin_family      = AF_INET;
-    sa -> sin_port        = htons(port);
+    sa -> sin_port        = htons(5000);//port);
     sa -> sin_addr.s_addr = htonl(INADDR_ANY);
 }
 

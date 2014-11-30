@@ -26,6 +26,7 @@ UserHandler::~UserHandler() {
 
 void UserHandler::initialize_thread(Message msg,bool is_server){
     //msg.debug_print_msg();
+    messages_vector.clear();
     messages_vector.push_back(msg);
     isServer = is_server;
     window_counter = 0;
@@ -50,7 +51,7 @@ void UserHandler::run_keep_alive_check(){
                     Message msg = ack.construct_packet(&packets_received_within_a_window);
                     Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
                     window_counter = 0;
-                    packets_received_within_a_window.clear();
+                    //packets_received_within_a_window.clear();
                  }
              });
 }
@@ -68,18 +69,6 @@ void UserHandler::notify_user_about_incomming_message(const Message msg){
     messages_vector.push_back(msg);
     //condition.notify_one();
 }
-
-/*
-bool noDublicates(std::vector<Message> inputVec, UDPPacket inputMes)
-{
-    for (size_t i = 0; i < inputVec.size(); i++)
-    {
-    if (inputMes== inputVec[i])
-    return false;
-    }
-    return true;
-}
-*/
 
 bool UserHandler::is_packet_already_received(unsigned int packet_ID){
     std::vector<unsigned int>::iterator IntIterator;
@@ -138,7 +127,7 @@ void UserHandler::loop(){
     
     //std::string ip = std::string(inet_ntoa(destination.sin_addr));
     //std::string port = std::to_string(ntohs(destination.sin_port));
-    printf("Message was fully received from : %s\n\n", packets_handler.get_whole_received_data().c_str() );
+    printf("Message was fully received from : %s\n\n", _msg.get_complete_data() );
     keep_alive_periodic_checker.destroy(tid);
     //if ( isServer )
     //    Socket::UDPsend_ACK_support(sock_fd, &_msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
