@@ -51,6 +51,7 @@ private:
     int sock_fd;
     SocketAddress destination;
     Timer keep_alive_periodic_checker;
+    Timer::timer_id tid;
     bool isServer;
     
     // vector takes remaining packets as an element

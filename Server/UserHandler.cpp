@@ -40,7 +40,7 @@ void UserHandler::initialize_thread(Message msg,bool is_server){
 
 // the Check occurs every one second
 void UserHandler::run_keep_alive_check(){
-    keep_alive_periodic_checker.create(0, 1000,
+    tid = keep_alive_periodic_checker.create(0, 1000,
              [&]() {
                  auto current_time = std::chrono::system_clock::now();
                  std::chrono::seconds sec(KEEP_ALIVE_CONSTANT);
@@ -135,8 +135,11 @@ void UserHandler::loop(){
     }
     
     Message _msg(packets_handler.get_whole_received_data());
-    printf("Message was fully received: %s\n\n", packets_handler.get_whole_received_data().c_str() );
     
+    //std::string ip = std::string(inet_ntoa(destination.sin_addr));
+    //std::string port = std::to_string(ntohs(destination.sin_port));
+    printf("Message was fully received from : %s\n\n", packets_handler.get_whole_received_data().c_str() );
+    keep_alive_periodic_checker.destroy(tid);
     //if ( isServer )
     //    Socket::UDPsend_ACK_support(sock_fd, &_msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
 }
