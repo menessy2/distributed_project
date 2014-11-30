@@ -17,6 +17,8 @@ MAX UDP PACKET IN IPv4 65507
 #include <string.h>
 #include <algorithm>
 #include <set>
+#include <mutex>
+#include <condition_variable>
 
 #include "../Payload/Message.h"
 #include "Commands/ACKCommand.h"
@@ -28,7 +30,7 @@ public:
 	Socket();
 	Socket(int); // port given as argument
 	static status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
-        static status UDPsend_ACK_support(int s, Message *message, SocketAddress destination,UPD_ENUM_COMMANDS cmd);
+        status UDPsend_ACK_support(int s, Message *message, SocketAddress destination,UPD_ENUM_COMMANDS cmd);
 	static status UDPreceive(int s, Message *m, SocketAddress *origin);
         static status raw_UDPsent(int s, char *packet, int size, SocketAddress destination);
         
@@ -43,7 +45,11 @@ protected:
 	void makeLocalSA(SocketAddress *sa, int port=-1);
 	void makeDestSA(SocketAddress *sa, char *hostname, unsigned short port);
         
-
+        // ONLY TO BE USED IN "UDPsend_ACK_support"
+        std::mutex queue_mutex;
+        std::condition_variable condition;
+        std::set<unsigned int> sent_packets,received_packets;
+        UDPPacketsHandler *packetsHandler;
 };
 
 #endif

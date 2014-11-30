@@ -4,7 +4,7 @@
 #include "Server/Server.h"
 #include "Payload/Message.h"
 
-#define NUMBER_THREADPOOL 1
+#define NUMBER_THREADPOOL 2
 
 using namespace std;
 

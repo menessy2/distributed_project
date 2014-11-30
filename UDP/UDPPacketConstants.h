@@ -34,7 +34,7 @@
 // PACKET CONFIGURATION PARAMETERS
 
 #define WINDOW_SIZE             10
-#define KEEP_ALIVE_CONSTANT     4000                        // in seconds
+#define KEEP_ALIVE_CONSTANT     4                           // in seconds
 #define TIMEOUT_OF_REPLY        KEEP_ALIVE_CONSTANT + 5     // in seconds
 
 #endif	/* UDPPACKETCONSTANTS_H */

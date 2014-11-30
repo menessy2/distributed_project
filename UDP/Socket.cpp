@@ -55,7 +55,7 @@ status Socket::UDPsend(int           s,
                         sizeof(SocketAddress))) < 0)
         {
             perror("Send failed\n");
-            //STATUS = BAD;
+            return status::BAD;
         }
 
         //if (n != message -> get_message_size())
@@ -66,7 +66,7 @@ status Socket::UDPsend(int           s,
 
     //if (accumulative == message->get_message_size() && accumulative != 0)
     //{
-        printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
+        //printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
         //STATUS = OK;
     //}
 
@@ -77,19 +77,23 @@ status Socket::UDPsend_ACK_support(int s,
                                     Message *message, 
                                     SocketAddress destination,
                                     UPD_ENUM_COMMANDS cmd){
-    int n, accumulative = 0;
+    int n;
     char packet[MAX_UDP_DATA_PACKET+1];
     int actual_packet_size;
     unsigned int window_counter = 0;
     
-    UDPPacketsHandler packetsHandler(message,cmd);      // make a new sequence number : to be changed
-    std::set<unsigned int> sent_packets,received_packets,result;
+    packetsHandler = new UDPPacketsHandler(message,cmd);      // make a new sequence number : to be changed
     
-    while ( ! packetsHandler.is_transmission_reached_to_end() )
+    //packetsHandler.set_command(cmd);
+    //packetsHandler.set_message(message);
+    
+    std::unique_lock<std::mutex> lock(queue_mutex);
+    
+    while ( ! packetsHandler->is_transmission_reached_to_end() )
     {
         do {
             bzero(packet, MAX_UDP_DATA_PACKET);
-            packetsHandler.get_next_packet(packet,actual_packet_size);
+            packetsHandler->get_next_packet(packet,actual_packet_size);
 
             if ((n = sendto(s, packet, actual_packet_size, 0, (struct sockaddr*) &destination,
                             sizeof(SocketAddress))) < 0)
@@ -105,29 +109,17 @@ status Socket::UDPsend_ACK_support(int s,
                 break;
             
         } while ( true );
-
-        Message expected_Ack;
-        Socket::UDPreceive(s, &expected_Ack, &destination);
-        ACKCommand ack;
-        received_packets = ack.parse_packet(expected_Ack.get_complete_data());
-        std::set_difference( sent_packets.begin(), sent_packets.end(), received_packets.begin(), received_packets.end(), std::inserter(result, result.begin()));
-        for( auto& packet_id : result){
-            int size;
-            packetsHandler.get_specific_packet(packet,size,packet_id);
-            Socket::raw_UDPsent(s, packet, size, destination);
-        }
         
+        // handle acks and
+        // wait for ack success
+        
+        condition.wait(lock);
         sent_packets.clear();
         received_packets.clear();
-        result.clear();
-        accumulative += n;
+        
     }
-
-    //if (accumulative == message->get_message_size() && accumulative != 0)
-    //{
-        printf("Packet(s) was sent successfully:  %d bytes\n", accumulative);
-        //STATUS = OK;
-    //}
+    
+    printf("\nMessage was sent successfully:  %d bytes\n", message->get_message_size());
 
     return status::OK;
 }

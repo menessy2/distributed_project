@@ -42,11 +42,12 @@ void Server::dispatch_connection_to_UserHandler(Message *received_pkt,SocketAddr
         UserHandler *user = new UserHandler(ip.c_str(),ntohs(sck.sin_port),sck,sockfd);
         user_handlers.insert( std::pair<const char*,UserHandler*>(result.c_str(),
                 user ) );
-        incomming_requests->enqueue( [&](){
-            received_pkt->debug_print_msg();
-            user->initialize_thread(*received_pkt,true);
-        });
-        //new std::thread(&UserHandler::initialize_thread, user, received_pkt);
+        
+        //incomming_requests->enqueue( [=](){
+        //    user->initialize_thread(*received_pkt,true);
+        //});
+        
+        new std::thread(&UserHandler::initialize_thread, user, *received_pkt,true);
         
     }
     

@@ -5,6 +5,7 @@
 #include <queue>
 #include <string>
 #include <stdint.h>
+#include <ctype.h>
 
 #include "../Payload/Message.h"
 #include "Commands/UDPCommands.h"
@@ -21,6 +22,7 @@ public:
     unsigned short get_remaining_packets()  { return remaining_packets; }
     std::string get_data() { return data; }
     unsigned int get_total_msg_size() { return total_msg_filesize; }
+    UPD_ENUM_COMMANDS get_command() { return command; }
     
     template <typename IntegerType>
     IntegerType bitsToInt(IntegerType& result, const unsigned char* bits, bool little_endian = false );
@@ -40,10 +42,13 @@ bool operator<(const UDPPacket& udp1,const UDPPacket& udp2);
 
 class UDPPacketsHandler {
 public:
+    //UDPPacketsHandler(); //used only in Socket for Socket::UDPsend_ACK_support
     UDPPacketsHandler(Message *rhs,UPD_ENUM_COMMANDS command);
     UDPPacketsHandler(UPD_ENUM_COMMANDS command=UPD_ENUM_COMMANDS::IDLE);
     std::string get_whole_received_data();
     void set_total_msg_size(unsigned int size);
+    void set_command(UPD_ENUM_COMMANDS cmd);
+    void set_message(Message *rhs);
     
     // For sending packets
     void get_next_packet(char *packet,int &size);
@@ -51,7 +56,7 @@ public:
     bool is_transmission_reached_to_end();
     
     // For receiving packets
-    UDPPacket parse_UDPPacket(char *);
+    void add_UDPPacket(UDPPacket& packet);
     bool is_full_message_received();
     
 private:

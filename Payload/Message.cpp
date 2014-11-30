@@ -70,6 +70,6 @@ bool Message::should_server_exit(){
 }
 
 Message::~Message(){
-   // if ( data_array != nullptr)
-   //     delete data_array;
+   if ( data_array != nullptr)
+        delete data_array;
 }

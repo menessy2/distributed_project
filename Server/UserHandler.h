@@ -21,7 +21,7 @@
 
 class UserHandler  {
 public:
-    UserHandler();
+    //UserHandler();
     UserHandler(const char *client_ip,int port,SocketAddress sck,int sock);
     UserHandler(const UserHandler& rhs);
     void initialize_thread(Message msg,bool is_server);
@@ -33,13 +33,15 @@ public:
     int get_port();
     void loop();
     std::string get_whole_data();
+    bool is_packet_already_received(unsigned int packet_ID);
     
+    std::vector<Message> messages_vector;
     
 private:
     std::chrono::system_clock::time_point keep_alive;
     unsigned int window_counter;
     UDPPacketsHandler packets_handler;
-    std::vector<Message> messages_vector;
+    
     
     std::mutex queue_mutex;
     std::condition_variable condition;

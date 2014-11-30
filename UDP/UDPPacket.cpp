@@ -1,7 +1,7 @@
 #include "UDPPacket.h"
 
 bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
-    return udp1.sequence_number < udp2.sequence_number;
+    return udp1.remaining_packets < udp2.remaining_packets;
 }
 
 
@@ -78,7 +78,12 @@ UDPPacket::UDPPacket(char *packet){
     window_size = bitsToInt<uint8_t>(window_size, window_array);
     total_msg_filesize = bitsToInt<unsigned int>(total_msg_filesize, total_message_size_array);
     
-    data = std::string(data_ptr);
+    data = "";
+    for ( int i=0; ( i < DATA_LENGTH ) && isalnum(data_ptr[i]) ;i++){
+        data += data_ptr[i];
+    }
+    
+    //data = std::string(data_ptr);
     /*
     remaining_packets = atoi(remaining_packets_array);
     timestamp = atol(timestamp_array);
@@ -102,6 +107,12 @@ IntegerType UDPPacket::bitsToInt(IntegerType& result, const unsigned char* bits,
 
 
 ///////////////////////////////////////////////////////////////////////////////
+/*
+UDPPacketsHandler::UDPPacketsHandler(){
+    srand(time(0));
+    starting_sequence_number = rand() % (1 << (SEQUENCE_NUMBER_LENGTH-1)*BYTE_SIZE)-1;
+}
+ */
 
 UDPPacketsHandler::UDPPacketsHandler(Message *rhs, UPD_ENUM_COMMANDS cmd) :
 msg(rhs), command(cmd), cursor(0), max_number_of_packets_to_receive(0) {
@@ -130,17 +141,28 @@ bool UDPPacketsHandler::is_transmission_reached_to_end(){
     return ( cursor + 1 ) >= msg->get_message_size();
 }
 
-UDPPacket UDPPacketsHandler::parse_UDPPacket(char *bytes_array){
-    UDPPacket packet(bytes_array);
+void UDPPacketsHandler::add_UDPPacket(UDPPacket& packet){
+    //UDPPacket packet(bytes_array);
     
     packets_vector.push(packet);
-    return packet;
+    //return packet;
 }
 
 
 bool UDPPacketsHandler::is_full_message_received(){
     return packets_vector.size() == max_number_of_packets_to_receive;
 }
+
+
+void UDPPacketsHandler::set_command(UPD_ENUM_COMMANDS cmd){
+    command = cmd;
+}
+
+
+void UDPPacketsHandler::set_message(Message *rhs){
+    msg = rhs;
+}
+
 
 void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
     construct_header(packet);
