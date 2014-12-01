@@ -3,10 +3,19 @@
 #include "Client/Client.h"
 #include "Server/Server.h"
 #include "Payload/Message.h"
+#include <arpa/inet.h>
 
 #define NUMBER_THREADPOOL 2
 
 using namespace std;
+
+bool isValidIpAddress(char *ipAddress)
+{
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ipAddress, &(sa.sin_addr));
+    return result != 0;
+}
+
 
 void usage(char ** argv)
 {
@@ -27,9 +36,19 @@ int main(int argc,char ** argv)
     {
         if (argc <= 2)
         {
-            printf("Usage: s machine port message\n");
+            printf("Usage: s machineID portNumber message\n");
             exit(-1);
         }
+	else
+		if( !isValidIpAddress(argv[2]) )
+		{
+			printf("Enter a Valid IP address \n");
+ 			printf("Usage: s machineID portNumber message\n");
+			exit(-1);
+		}
+
+
+
         unsigned int port = atoi(argv[3]);
         Client  c;
         Message reply;
@@ -52,5 +71,4 @@ int main(int argc,char ** argv)
 
     return 0;
 }
-
 
