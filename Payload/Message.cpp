@@ -24,6 +24,14 @@ Message::Message(std::string str){
     set_string(str.c_str(),str.length());
 }
 
+std::string Message::get_string(){
+    std::string temp="";
+    for(int i=0;i<size;i++){
+        temp += data_array[i];
+    }
+    return temp;
+}
+
 char *Message::get_data_without_header(){
     return data_array+HEADER_SIZE;
 }

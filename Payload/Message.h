@@ -24,6 +24,7 @@ public:
     char *get_data_without_header();
     void debug_print_msg();
     void print_header();
+    std::string get_string();
 
 private:
     size_t size;    

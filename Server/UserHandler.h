@@ -12,6 +12,9 @@
 #include <ctime>
 #include <ratio>
 #include <chrono>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "../UDP/UDPPacket.h"
 #include "../UDP/Socket.h"

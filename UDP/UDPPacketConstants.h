@@ -35,6 +35,6 @@
 
 #define WINDOW_SIZE             10
 #define KEEP_ALIVE_CONSTANT     2                           // in seconds
-#define TIMEOUT_OF_REPLY        KEEP_ALIVE_CONSTANT + 5     // in seconds
+#define TIMEOUT_OF_REPLY        KEEP_ALIVE_CONSTANT + 7     // in seconds
 
 #endif	/* UDPPACKETCONSTANTS_H */

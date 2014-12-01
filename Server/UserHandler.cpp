@@ -45,8 +45,18 @@ void UserHandler::run_keep_alive_check(){
              [&]() {
                  auto current_time = std::chrono::system_clock::now();
                  std::chrono::seconds sec(KEEP_ALIVE_CONSTANT);
+                 std::chrono::seconds sec2(TIMEOUT_OF_REPLY);
                  auto difference = std::chrono::duration_cast<std::chrono::seconds>(sec);
-                 if ( ( current_time - keep_alive ) > difference ){
+                 auto client_death_difference = std::chrono::duration_cast<std::chrono::seconds>(sec2);
+                 auto result = current_time - keep_alive ;
+                 if ( result > client_death_difference ){
+                     // call destructor
+                     printf("Peer computer %s:%d is disconnected.\n",
+                                        inet_ntoa(destination.sin_addr),
+                                        ntohs(destination.sin_port) );
+                     keep_alive_periodic_checker.destroy(tid);
+                 }
+                 else if ( result > difference ){
                     ACKCommand ack;
                     Message msg = ack.construct_packet(&packets_received_within_a_window);
                     if ( msg.get_message_size() != 0)
@@ -92,8 +102,8 @@ void UserHandler::loop(){
         while ( messages_vector.empty() );
         
         Message msg = messages_vector.back();
-        printf("in USERHANDLER:\n");
-        msg.debug_print_msg();
+        //printf("in USERHANDLER:\n");
+        //msg.debug_print_msg();
         
         UDPPacket packet(messages_vector.back().get_complete_data());
         
@@ -114,9 +124,9 @@ void UserHandler::loop(){
             ACKCommand ack;
             Message msg = ack.construct_packet(&packets_received_within_a_window);
             Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK_SUCCESS);
-            window_counter = 0;
             packets_received_within_a_window.clear();
-            printf("Acknowledgment :\n");
+            printf("* Acknowledgment of %d packets was sent *\n",window_counter);
+            window_counter = 0;
         }
         // Conditions based on the UDP Packet
         
@@ -133,7 +143,12 @@ void UserHandler::loop(){
     
     //std::string ip = std::string(inet_ntoa(destination.sin_addr));
     //std::string port = std::to_string(ntohs(destination.sin_port));
-    printf("Message was fully received from : %s\n\n", _msg.get_complete_data() );
+    printf("Message was fully received from ( %s:%d ) : \n\tLength: %d bytes\n\tContent: %s\n\n",
+                        inet_ntoa(destination.sin_addr),
+                        ntohs(destination.sin_port),
+                        _msg.get_message_size(),
+                        _msg.get_string().c_str() );
+    
     keep_alive_periodic_checker.destroy(tid);
     //if ( isServer )
     //    Socket::UDPsend_ACK_support(sock_fd, &_msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
