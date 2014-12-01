@@ -7,7 +7,7 @@ Message ACKCommand::construct_packet(std::vector<unsigned int>* rhs){
     for( auto& i : *rhs ){
         msg += std::to_string(i) + ";";
     }
-    
+    msg += '\x00';
     return Message(msg);
 }
 

@@ -22,12 +22,15 @@ void Client::handle_Acks(char *packet_bytes,SocketAddress destination,int sock){
     ACKCommand ack;
     received_packets = ack.parse_packet(packet_bytes);
     std::set_difference( sent_packets.begin(), sent_packets.end(), received_packets.begin(), received_packets.end(), std::inserter(result, result.begin()));
+    printf("ACK sent: ");
     for( auto& packet_id : result){
         unsigned int size;
         bzero(packet, MAX_UDP_DATA_PACKET);
         packetsHandler->get_specific_packet(packet,size,packet_id);
         Socket::raw_UDPsent(sock, packet, size, destination);
+        printf("%d : %d ; ", packet_id, UDPPacket(packet).get_remaining_packets() );
     }
+    printf("\n");
 }
 
 status Client::DoOperation(Message *     message,

@@ -42,7 +42,7 @@ status Socket::UDPsend(int           s,
 {
     int n, accumulative = 0;
     char packet[MAX_UDP_DATA_PACKET+1];
-    int actual_packet_size;
+    unsigned int actual_packet_size;
     
     UDPPacketsHandler packetsHandler(message,cmd);      // make a new sequence number : to be changed
     
@@ -79,7 +79,7 @@ status Socket::UDPsend_ACK_support(int s,
                                     UPD_ENUM_COMMANDS cmd){
     int n;
     char packet[MAX_UDP_DATA_PACKET+1];
-    int actual_packet_size;
+    unsigned int actual_packet_size;
     unsigned int window_counter = 0;
     
     packetsHandler = new UDPPacketsHandler(&message,cmd);      // make a new sequence number : to be changed

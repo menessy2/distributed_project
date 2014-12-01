@@ -51,7 +51,7 @@ public:
     void set_message(Message *rhs);
     
     // For sending packets
-    void get_next_packet(char *packet,int &size);
+    void get_next_packet(char *packet,unsigned int &size);
     void get_specific_packet(char *packet,unsigned int &size,unsigned int packetID);
     bool is_transmission_reached_to_end();
     
@@ -77,6 +77,8 @@ private:
     void set_command(char *buffer,UPD_ENUM_COMMANDS cmd);
     void set_window_size(char *buffer);
     void set_total_message_size(char *buffer);
+    
+    void overwrite_remaining_packets(char *packet,unsigned int packetID);
     
     unsigned int get_remaining_packets();
     unsigned int get_total_packets_number();

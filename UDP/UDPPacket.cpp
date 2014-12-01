@@ -172,27 +172,35 @@ void UDPPacketsHandler::set_message(Message *rhs){
 }
 
 
-void UDPPacketsHandler::get_next_packet(char *packet,int &size) {
+void UDPPacketsHandler::get_next_packet(char *packet,unsigned int &size) {
     construct_header(packet);
-    size = std::min(DATA_LENGTH,(int)(msg->get_message_size()- this->cursor) );
-    char *buffer = new char[size];
+    size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(msg->get_message_size()- this->cursor) );
+    char buffer[DATA_LENGTH];
+    bzero(buffer,DATA_LENGTH);
     msg->split_string(cursor, size, buffer);
     memcpy(packet+HEADER_SIZE, buffer ,size);
     cursor += size;
     size += HEADER_SIZE;
-    delete buffer;
 }
 
 void UDPPacketsHandler::get_specific_packet(char *packet,unsigned int &size,unsigned int packetID){
     construct_header(packet,UPD_ENUM_COMMANDS::RETRANSMIT);
-    unsigned int start = ( get_total_packets_number() - packetID) * DATA_LENGTH;
-    int temp = (unsigned int)msg->get_message_size()-start;
-    size = std::min(DATA_LENGTH,temp);
-    char *buffer = new char[size];
+    overwrite_remaining_packets(packet,packetID);
+    unsigned int start = ( get_total_packets_number() - packetID - 1) * DATA_LENGTH;
+    unsigned int temp = (unsigned int)msg->get_message_size()-start;
+    size = std::min<unsigned int>(DATA_LENGTH,temp);
+    char buffer[DATA_LENGTH];
+    bzero(buffer,DATA_LENGTH);
     msg->split_string(start, size, buffer);
     memcpy(packet+HEADER_SIZE, buffer ,size);
     size += HEADER_SIZE;
-    delete buffer;
+}
+
+void UDPPacketsHandler::overwrite_remaining_packets(char *packet,unsigned int packetID){
+    unsigned char *remaining_packets_START = packet + SC_CHECKSUM_LENGTH + \
+                                                      TIMESTAMP_LENGTH   + \
+                                                      SEQUENCE_NUMBER_LENGTH;
+    convert_int_to_bytes(packetID, remaining_packets_START);
 }
 
 void UDPPacketsHandler::set_total_msg_size(unsigned int _size)  {

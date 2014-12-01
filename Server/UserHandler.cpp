@@ -49,8 +49,13 @@ void UserHandler::run_keep_alive_check(){
                  if ( ( current_time - keep_alive ) > difference ){
                     ACKCommand ack;
                     Message msg = ack.construct_packet(&packets_received_within_a_window);
-                    Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
-                    window_counter = 0;
+                    if ( msg.get_message_size() != 0)
+                        Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK);
+                    
+                    printf("Periodic check:%s",msg.get_complete_data());
+                    //msg.debug_print_msg();
+                    printf("\n");
+                    //window_counter = 0;
                     //packets_received_within_a_window.clear();
                  }
              });
@@ -87,8 +92,8 @@ void UserHandler::loop(){
         while ( messages_vector.empty() );
         
         Message msg = messages_vector.back();
-        //printf("in USERHANDLER:\n");
-        //msg.debug_print_msg();
+        printf("in USERHANDLER:\n");
+        msg.debug_print_msg();
         
         UDPPacket packet(messages_vector.back().get_complete_data());
         
@@ -111,6 +116,7 @@ void UserHandler::loop(){
             Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK_SUCCESS);
             window_counter = 0;
             packets_received_within_a_window.clear();
+            printf("Acknowledgment :\n");
         }
         // Conditions based on the UDP Packet
         
