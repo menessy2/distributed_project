@@ -19,6 +19,7 @@ bool isValidIpAddress(char *ipAddress)
 
 void usage(char ** argv)
 {
+	//
     printf("Usage:s(end) ...or r(eceive) ??\n");
     printf("ex: %s s machine port message\n", argv[0]);
     printf("ex: %s r\n", argv[0]);
