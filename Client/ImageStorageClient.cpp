@@ -29,15 +29,16 @@ void ImageStorageClient::send_image(Image *image_obj){
         printf("Sorry, file does not exist!\n");
     } else {
         std::string filename = filepath.substr( filepath.find_last_of("\\/") + 1 );
-        size_t len;
-        unsigned char *image = read_bytes_from_file(filepath.c_str(),len);
+        //size_t len;
+        //unsigned char *image = read_bytes_from_file(filepath.c_str(),len);
 
         Message message(filename);
         Socket::UDPsend_ACK_support2(s, message, destinationSA,UPD_ENUM_COMMANDS::CREATE_FILE,session);
 
-        Message message_to_send(image,len);
-        DoOperation(&message_to_send, &reply, s, destinationSA);
-        delete image;
+        
+        Socket::UDPsend_ACK_support_with_fd(s, filename.c_str(), destinationSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA,session);
+        
+        //delete image;
     }
 }
 
@@ -137,11 +138,7 @@ status ImageStorageClient::DoOperation(Message *     message,
 }
 
 
-std::ifstream::pos_type filesize(const char* filename)
-{
-    std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
-    return in.tellg(); 
-}
+
 
 
 

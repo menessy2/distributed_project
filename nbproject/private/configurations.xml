@@ -11,6 +11,9 @@
         <in>ImageStorageClient.h</in>
       </df>
       <df name="Misc">
+        <in>FileLocker.cpp</in>
+        <in>FileLocker.h</in>
+        <in>Filelocker.cpp</in>
         <in>Security.cpp</in>
         <in>Security.h</in>
         <in>timer.cpp</in>
@@ -107,11 +110,13 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000 "Adsasd"</runcommandpicklistitem>
           <runcommandpicklistitem>./ex_2 s 127.0.0.1 5000 $(python -c 'print "A"*58')</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000 $(python -c 'print "A"*58')</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" r</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy ele.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy a.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" r</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy b.pdf</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy ele.pdf</runcommand>
+        <runcommand>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy b.pdf</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>

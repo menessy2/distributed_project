@@ -63,17 +63,6 @@ void ImageStorageUserHandler::loop(){
             continue;
         }*/
         
-        /*
-        if ( is_packet_already_received(packet_id) || ! packet.is_checksum_correct() ){
-            messages_vector.pop();
-            //refresh_keep_alive();
-            continue;
-        }*/
-        
-        if ( packet_id == 1 || packet_id == 0){
-            printf("catch this\n");
-        }
-        
         
         if ( isServer )  {
             
@@ -129,7 +118,7 @@ void ImageStorageUserHandler::loop(){
                     Message ok("ok");
                     Socket::UDPsend(sock_fd,&ok,destination,UPD_ENUM_COMMANDS::CREATE_FILE_SUCCESS);
                     messages_vector.pop();
-                    packets_handler.reset_Handler(packet.get_total_msg_size());
+                    packets_handler.reset_Handler(filename);
                     continue;
                 }
                 case UPD_ENUM_COMMANDS::REQUEST_FILE:
@@ -176,8 +165,6 @@ void ImageStorageUserHandler::loop(){
             continue;
         }
         
-        // packets_handler.reset_Handler(packet.get_total_msg_size());
-        
         if ( is_first_window_packet ){
             accumulative_window = packet.get_window_size();
             packets_handler.set_total_msg_size(packet.get_total_msg_size());
@@ -188,8 +175,10 @@ void ImageStorageUserHandler::loop(){
 
         packets_received_within_a_window.push_back(packet.get_remaining_packets());
         
+        /*
         if ( ++magic_counter % MAGIC_NUMBER == 0)
             std::this_thread::sleep_for (std::chrono::milliseconds(500));
+        */
         
         if ( ( ++window_counter % accumulative_window == 0) ) {
             // send acknowledgment
@@ -239,7 +228,7 @@ void ImageStorageUserHandler::message_notification(Message& msg){
         printf("Image was successfully received: %s @ %s\n",logged_user.c_str(),filename.c_str());
     else
         printf("Image was successfully received: %s\n",CLIENT_FILENAME.c_str());
-    printf("Image size: %d\n",msg.get_message_size());
+    //printf("Image size: %d\n",msg.get_message_size());
     
 }
 
@@ -258,11 +247,11 @@ void ImageStorageUserHandler::server_Reaction_upon_success(Message& msg){
     }
     
     std::string whole_filepath = std::string(BASE_DIR) + logged_user + "/" + filename;
-    std::ofstream outfile (whole_filepath.c_str(),std::ofstream::binary);
-    outfile.write(msg.get_complete_data(),msg.get_message_size());
+    //std::ofstream outfile (whole_filepath.c_str(),std::ofstream::binary);
+    //outfile.write(msg.get_complete_data(),msg.get_message_size());
     
     msg.explicit_free();
-    outfile.close();
+    //outfile.close();
     
     files_status[filename] = temp_status;
     

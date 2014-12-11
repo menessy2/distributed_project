@@ -31,6 +31,7 @@ public:
 	static status UDPsend(int s, Message *m, SocketAddress destination,UPD_ENUM_COMMANDS cmd=UPD_ENUM_COMMANDS::TRANSMIT_DATA);
         status UDPsend_ACK_support(int s, Message message, SocketAddress destination,UPD_ENUM_COMMANDS cmd);
         status UDPsend_ACK_support2(int s, Message message, SocketAddress destination,UPD_ENUM_COMMANDS cmd,std::string &session);
+        status UDPsend_ACK_support_with_fd(int s, const char *filename, SocketAddress destination,UPD_ENUM_COMMANDS cmd,std::string &session);
 	static status UDPreceive(int s, Message *m, SocketAddress *origin);
         static status raw_UDPsent(int s, char *packet, int size, SocketAddress destination);
         

@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 #include "UDPPacket.h"
 
 bool operator<(const UDPPacket& udp1, const UDPPacket& udp2){
@@ -88,21 +91,64 @@ IntegerType UDPPacket::bitsToInt(IntegerType& result, const unsigned char* bits,
 ///////////////////////////////////////////////////////////////////////////////
 
 UDPPacketsHandler::UDPPacketsHandler(Message *rhs, UPD_ENUM_COMMANDS cmd) :
-msg(rhs), command(cmd), cursor(0), max_number_of_packets_to_receive(0) {
+msg(rhs), command(cmd), cursor(0), max_number_of_packets_to_receive(0), is_source_from_file(false),
+is_destination_to_file(false) {
     srand(time(0));
     starting_sequence_number = static_cast<unsigned int>(rand() % (1 << (SEQUENCE_NUMBER_LENGTH-1)*BYTE_SIZE)-1);
     total_msg_size = rhs->get_message_size();
+    packets_received = 0;
 }
 
-void UDPPacketsHandler::reset_Handler(unsigned int _size){
-    set_total_msg_size(_size);
+UDPPacketsHandler::UDPPacketsHandler(const char *filename,UPD_ENUM_COMMANDS command) :
+is_source_from_file(true), command(command), max_number_of_packets_to_receive(0), is_destination_to_file(false) {
+    srand(time(0));
+    
+    
+    
+    starting_sequence_number = static_cast<unsigned int>(rand() % (1 << (SEQUENCE_NUMBER_LENGTH-1)*BYTE_SIZE)-1);
+    
+    pFile = fopen (filename,"r");
+    //file.open(filename, std::ios::in | std::ios::binary);
+    //fd_for_specific_packets.open(filename, std::ios::in | std::ios::binary);
+    
+    long begin,end;
+    
+    fseek (pFile, 0, SEEK_END);  
+    end = ftell(pFile);
+    
+    total_msg_size = end;
+    fseek(pFile , 0 , SEEK_SET);
+    
+    //file.seekg(0, std::ios::beg); 
+    file_cursor = 0;
+    packets_received = 0;
+}
+
+
+UDPPacketsHandler::~UDPPacketsHandler(){
+    
+    if ( is_source_from_file ) {
+        //file.close();
+        //fd_for_specific_packets->close();
+        //produced_file.close();
+    }
+}
+
+
+void UDPPacketsHandler::reset_Handler(std::string filepath){
+    //set_total_msg_size(_size);
+    is_destination_to_file = true;
+    filepath_to_write_at = filepath;
+    produced_file.open(filepath.c_str(), std::ofstream::binary);
     clear_queue(packets_vector);
+    packets_received = 0;
 }
 
 UDPPacketsHandler::UDPPacketsHandler(UPD_ENUM_COMMANDS cmd) : command(cmd), 
         max_number_of_packets_to_receive(0), cursor(0) {
     srand(time(0));
     starting_sequence_number = rand() % (1 << (SEQUENCE_NUMBER_LENGTH-1)*BYTE_SIZE)-1;
+    packets_received = 0;
 }
 
 std::string UDPPacketsHandler::get_whole_received_data(){
@@ -116,16 +162,28 @@ std::string UDPPacketsHandler::get_whole_received_data(){
 }
 
 bool UDPPacketsHandler::is_transmission_reached_to_end(){
-    return ( cursor + 1 ) >= msg->get_message_size();
+    return ( cursor + 1 ) >= total_msg_size;
 }
 
 void UDPPacketsHandler::add_UDPPacket(UDPPacket& packet){
-    packets_vector.push(packet);
+    if ( is_destination_to_file ){
+        unsigned long long pos = ( get_total_packets_number() - packet.get_remaining_packets() )*DATA_LENGTH;
+        produced_file.seekp(pos);
+        std::string data = packet.get_data();
+        produced_file.write(data.c_str(),data.length());
+        packets_received += 1;
+    }
+    else {
+        packets_vector.push(packet);
+    }
 }
 
 
 bool UDPPacketsHandler::is_full_message_received(){
-    return packets_vector.size() == max_number_of_packets_to_receive;
+    if ( is_destination_to_file )
+        return packets_received == max_number_of_packets_to_receive;
+    else
+        return packets_vector.size() == max_number_of_packets_to_receive;
 }
 
 
@@ -141,12 +199,26 @@ void UDPPacketsHandler::set_message(Message *rhs){
 
 void UDPPacketsHandler::get_next_packet(char *packet,unsigned int &size) {
     construct_header(packet);
-    size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(msg->get_message_size()- this->cursor) );
+    if ( is_source_from_file ){
+        //file.seekg( 0, file_cursor );
+        fseek ( pFile , file_cursor , SEEK_SET );
+        size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(total_msg_size -  ftell(pFile) ) );
+    }
+    else
+        size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(msg->get_message_size()- this->cursor) );
+    
     char buffer[DATA_LENGTH];
     bzero(buffer,DATA_LENGTH);
-    msg->split_string(cursor, size, buffer);
+    
+    if ( is_source_from_file ){
+        fread (buffer,1,size,pFile);
+        file_cursor = ftell(pFile);
+    } else {
+        msg->split_string(cursor, size, buffer);
+        cursor += size;
+    }
+    
     memcpy(packet+HEADER_SIZE, buffer ,size);
-    cursor += size;
     size += HEADER_SIZE;
     
     set_data_checksum(buffer,DATA_LENGTH,packet);
@@ -158,11 +230,19 @@ void UDPPacketsHandler::get_specific_packet(char *packet,unsigned int &size,unsi
     construct_header(packet,UPD_ENUM_COMMANDS::RETRANSMIT);
     overwrite_remaining_packets(packet,packetID);
     unsigned int start = ( get_total_packets_number() - packetID - 1) * DATA_LENGTH;
-    unsigned int temp = (unsigned int)msg->get_message_size()-start;
+    unsigned int temp = (unsigned int)total_msg_size-start;
     size = std::min<unsigned int>(DATA_LENGTH,temp);
     char buffer[DATA_LENGTH];
     bzero(buffer,DATA_LENGTH);
-    msg->split_string(start, size, buffer);
+    
+    if ( is_source_from_file ){
+        //fd_for_specific_packets->seekg(0, start);
+        //fd_for_specific_packets->read(buffer,size);
+    }    
+    else
+        msg->split_string(start, size, buffer);
+    
+    
     memcpy(packet+HEADER_SIZE, buffer ,size);
     size += HEADER_SIZE;
     
@@ -258,12 +338,11 @@ void UDPPacketsHandler::construct_header(char *packet,UPD_ENUM_COMMANDS cmd) {
 
 
 unsigned int UDPPacketsHandler::get_remaining_packets(){
-    //return (msg->get_message_size() - cursor) / DATA_LENGTH;
-    //if ( get_total_packets_number() == 1)
-    //    return 0;
-    unsigned int remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
-    //if ( ( (msg->get_message_size() - cursor) % DATA_LENGTH ) != 0 )
-    //    remaining_packets += 1;
+    unsigned int remaining_packets;
+    if ( is_source_from_file )
+        remaining_packets = ( total_msg_size - ftell(pFile) ) / DATA_LENGTH;
+    else
+        remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
     return remaining_packets;
 }
 

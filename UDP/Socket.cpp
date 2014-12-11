@@ -32,6 +32,57 @@ status Socket::UDPsend(int           s,
 }
 
 
+status Socket::UDPsend_ACK_support_with_fd(int s, const char *filename, \
+                                    SocketAddress destination, \
+                                    UPD_ENUM_COMMANDS cmd,std::string &session){
+    
+    int n;
+    char packet[MAX_UDP_DATA_PACKET+1];
+    unsigned int actual_packet_size;
+    unsigned int window_counter = 0;
+    
+    packetsHandler = new UDPPacketsHandler(filename,cmd);      // make a new sequence number : to be changed
+    packetsHandler->set_session(session);
+    
+    std::unique_lock<std::mutex> lock(queue_mutex);
+    
+    while ( ! packetsHandler->is_transmission_reached_to_end() )
+    {
+        do {
+            bzero(packet, MAX_UDP_DATA_PACKET);
+            packetsHandler->get_next_packet(packet,actual_packet_size);
+
+            if ((n = sendto(s, packet, actual_packet_size, 0, (struct sockaddr*) &destination,
+                            sizeof(SocketAddress))) < 0)
+            {
+                perror("Send failed\n");
+                return status::BAD;
+            }
+            
+            UDPPacket udp_packet( packet );
+            sent_packets.insert(udp_packet.get_remaining_packets());
+            
+            if ( ( ++window_counter % udp_packet.get_window_size() ) == 0 )
+                break;
+            
+        } while ( true );
+        
+        // handle acks and
+        // wait for ack success
+        
+        condition.wait(lock);
+        sent_packets.clear();
+        received_packets.clear();
+        
+    }
+    
+    printf("\nMessage was sent successfully:  %d bytes\n", packetsHandler->get_total_message_size() );
+
+    return status::OK;
+    
+
+}
+
 status Socket::UDPsend_ACK_support2(int s, Message message, \
         SocketAddress destination,UPD_ENUM_COMMANDS cmd,\
         std::string &session){

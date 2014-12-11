@@ -11,7 +11,7 @@
 #include "Server/ImageStorageServer.h"
 #include "Payload/Image.h"
 
-#define NUMBER_THREADPOOL 5
+#define NUMBER_THREADPOOL 1
 
 using namespace std;
 

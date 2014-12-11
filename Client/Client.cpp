@@ -63,9 +63,8 @@ void Client::handle_Acks(char *packet_bytes,SocketAddress destination,int sock){
         unsigned int size;
         bzero(packet, MAX_UDP_DATA_PACKET);
         packetsHandler->get_specific_packet(packet,size,packet_id);
-        UDPPacket my(packet);
         Socket::raw_UDPsent(sock, packet, size, destination);
-        printf("%d:%d", packet_id, my.get_remaining_packets() );
+        printf("%d, ", packet_id );
     }
     printf("\n");
 }

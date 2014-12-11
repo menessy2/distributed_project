@@ -8,6 +8,7 @@
 #include "../Server/ImageStorageUserHandler.h"
 #include "../Payload/Image.h"
 #include "../UDP/Commands/AUTHCommand.h"
+#include "../Misc/FileLocker.h"
 
 
 class ImageStorageClient : public Client {

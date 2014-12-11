@@ -6,24 +6,24 @@ CFLAGS=-c $(ADDIT)
 all: ex1 ex2
 
 ex1: 	ex1.o 			\
-	Misc/Security.o Misc/timer.o	\
+	Misc/Security.o Misc/timer.o   Misc/FileLocker.o	\
 	Payload/Message.o	\
 	UDP/Socket.o UDP/UDPPacket.o UDP/Commands/ACKCommand.o \
 	Server/Server.o Server/ThreadPool.o Server/UserHandler.o  Server/EchoServer.o\
 	Client/Client.o Client/EchoClient.o Server/EchoUserHandler.o
-	$(CC) $(ADDIT) ex1.o Message.o ACKCommand.o \
+	$(CC) $(ADDIT) ex1.o Message.o FileLocker.o ACKCommand.o \
 		Socket.o UDPPacket.o EchoClient.o EchoServer.o EchoUserHandler.o \
 		Server.o ThreadPool.o UserHandler.o  \
 		Client.o timer.o Security.o -o ex_1
 
 
 ex2: 	ex2.o	\
-	Misc/Security.o Misc/timer.o	\
+	Misc/Security.o Misc/timer.o  Misc/FileLocker.o \
 	Payload/Image.o Payload/Message.o	\
 	UDP/Socket.o UDP/UDPPacket.o UDP/Commands/ACKCommand.o UDP/Commands/AUTHCommand.o \
 	Server/Server.o Server/ThreadPool.o Server/UserHandler.o  Server/ImageStorageServer.o\
 	Client/Client.o Client/ImageStorageClient.o Server/ImageStorageUserHandler.o Server/Auth/AuthHandler.o
-	$(CC) $(ADDIT) ex2.o Message.o Image.o ACKCommand.o AuthHandler.o \
+	$(CC) $(ADDIT) ex2.o Message.o FileLocker.o Image.o ACKCommand.o AuthHandler.o \
 		Socket.o UDPPacket.o ImageStorageClient.o ImageStorageServer.o ImageStorageUserHandler.o \
 		Server.o ThreadPool.o UserHandler.o  AUTHCommand.o \
 		Client.o timer.o Security.o -o executable
@@ -42,6 +42,9 @@ ex2.o: ex2.cpp
 
 Misc/Security.o: Misc/Security.cpp Misc/Security.h
 	$(CC) $(CFLAGS) Misc/Security.cpp
+
+Misc/FileLocker.o: Misc/FileLocker.cpp Misc/FileLocker.h
+	$(CC) $(CFLAGS) Misc/FileLocker.cpp
 
 Misc/timer.o: Misc/timer.cpp  Misc/timer.h
 	$(CC) $(CFLAGS) Misc/timer.cpp
