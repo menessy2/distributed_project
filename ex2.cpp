@@ -47,20 +47,23 @@ int main(int argc,char ** argv)
         //list_of_images_to_send.push_back("Image.mp3");
         
         //c.request_image("image1.png");
+        
+        /*
         for ( auto& image_path : list_of_images_to_send ){
             ImageStorageClient  c;
             c.initialize_client(argv[2], port);
             c.authenticate(username,pass);
             Image temp_image(image_path);
             c.send_image(&temp_image);
-        }
-        /*
+        }*/
+        
+        
         printf("asdasd\n");
         ImageStorageClient  c;
         c.initialize_client(argv[2], port);
         c.authenticate(username,pass);
-        c.request_image("image1.png");
-        */
+        c.request_image("e.pdf");
+        
         
     }
     else if (*argv[1] == 'r')

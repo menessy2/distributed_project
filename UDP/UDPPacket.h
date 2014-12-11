@@ -94,6 +94,8 @@ private:
     std::fstream fd_for_specific_packets;
     std::streampos file_cursor;
     
+    FileLocker *flock;
+    
     // For receiving packets
     bool is_destination_to_file;
     std::string filepath_to_write_at;

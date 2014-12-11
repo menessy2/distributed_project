@@ -42,6 +42,13 @@ void ImageStorageClient::send_image(Image *image_obj){
     }
 }
 
+void ImageStorageClient::delete_dir(){
+    
+    Message msg("delete");
+    UDPsend_ACK_support2(s, msg, destinationSA,UPD_ENUM_COMMANDS::DELETE_DIR_REQUEST,session);
+    
+}
+
 
 void ImageStorageClient::request_image(std::string image_name){
     //Socket::makeLocalSA(&destinationSA);
@@ -113,6 +120,9 @@ void ImageStorageClient::listener(){
                 break;
             case UPD_ENUM_COMMANDS::REQUEST_FILE_FAILURE:
                 printf("Requested file does not exist\n");
+                break;
+            case UPD_ENUM_COMMANDS::DELETE_DIR_RESPONSE:
+                printf("Delete request was sent to the server\n");
                 break;
                 
                 

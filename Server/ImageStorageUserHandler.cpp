@@ -131,9 +131,10 @@ void ImageStorageUserHandler::loop(){
                     //printf("%s",_file.c_str());
                     if (  is_file_exist(_file) ){
                         size_t len;
-                        unsigned char *image_bytes = read_bytes_from_file(_file.c_str(),len);
-                        Message __msg(image_bytes,len);
-                        new std::thread(&Socket::UDPsend_ACK_support, &test_sock, sock_fd, __msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+                        //unsigned char *image_bytes = read_bytes_from_file(_file.c_str(),len);
+                        //Message __msg(image_bytes,len);
+                        //new std::thread(&Socket::UDPsend_ACK_support, &test_sock, sock_fd, __msg, destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
+                        new std::thread(&Socket::UDPsend_ACK_support_with_fd2, &test_sock, sock_fd, _file.c_str(), destination,UPD_ENUM_COMMANDS::TRANSMIT_DATA);
                     } else {
                         Message failure("failure");
                         Socket::UDPsend(sock_fd,&failure,destination,UPD_ENUM_COMMANDS::REQUEST_FILE_FAILURE);
@@ -148,6 +149,13 @@ void ImageStorageUserHandler::loop(){
                 case UPD_ENUM_COMMANDS::ACK_SUCCESS:
                     test_sock.condition.notify_one();   // continue transmission with the new bulk of the window 
                     messages_vector.pop();
+                    continue;
+                case UPD_ENUM_COMMANDS::DELETE_DIR_REQUEST:
+                    std::string folder = std::string(BASE_SERVER_STORAGE) + logged_user + "/";
+                    remove_directory( folder.c_str() );
+                    messages_vector.pop();
+                    Message _response("response");
+                    Socket::UDPsend(sock_fd,&_response,destination,UPD_ENUM_COMMANDS::DELETE_DIR_RESPONSE);
                     continue;
             }
         }
@@ -168,8 +176,15 @@ void ImageStorageUserHandler::loop(){
         }
         
         if ( is_first_window_packet ){
-            accumulative_window = packet.get_window_size();
+            
             packets_handler.set_total_msg_size(packet.get_total_msg_size());
+            
+            if ( ! isServer ){
+                packets_handler.reset_Handler(std::string(BASE_CLIENT_STORAGE) + CLIENT_FILENAME);
+            }
+            
+            accumulative_window = packet.get_window_size();
+            
             is_first_window_packet = false;
             total_packet_size = packet.get_total_msg_size();
         }
@@ -228,12 +243,10 @@ void ImageStorageUserHandler::loop(){
 
 void ImageStorageUserHandler::message_notification(Message& msg){
     
-    int fd = dup(0);
-    close(fd);
-    
-    
     
     if ( isServer ){
+        int fd = dup(0);
+        close(fd);
         printf("Image was successfully received: %s\n", filename.c_str());
         
         std::string _filename = std::string(LOGGING);
@@ -284,12 +297,12 @@ void ImageStorageUserHandler::server_Reaction_upon_success(Message& msg){
 
 void ImageStorageUserHandler::client_Reaction_upon_success(Message& msg){
     
-    std::string whole_filepath = std::string(BASE_CLIENT_STORAGE) + "/" + CLIENT_FILENAME;
-    std::ofstream outfile (whole_filepath.c_str(),std::ofstream::binary);
-    outfile.write(msg.get_complete_data(),msg.get_message_size());
+    //std::string whole_filepath = std::string(BASE_CLIENT_STORAGE) + "/" + CLIENT_FILENAME;
+    //std::ofstream outfile (whole_filepath.c_str(),std::ofstream::binary);
+    //outfile.write(msg.get_complete_data(),msg.get_message_size());
     
     msg.explicit_free();
-    outfile.close();
+    //outfile.close();
 }
 
 void ImageStorageUserHandler::action_when_user_reaches_timeout() {
@@ -299,4 +312,57 @@ void ImageStorageUserHandler::action_when_user_reaches_timeout() {
     if ( isServer ){
         user_handlers->erase(std::string(connected_ip)+":"+std::to_string(port));
     }
+}
+
+
+int ImageStorageUserHandler::remove_directory(const char *path)
+{
+   DIR *d = opendir(path);
+   size_t path_len = strlen(path);
+   int r = -1;
+
+   if (d)
+   {
+      struct dirent *p;
+      r = 0;
+      while (!r && (p=readdir(d)))
+      {
+          int r2 = -1;
+          char *buf;
+          size_t len;
+
+          if (!strcmp(p->d_name, ".") || !strcmp(p->d_name, ".."))
+          {
+             continue;
+          }
+
+          len = path_len + strlen(p->d_name) + 2; 
+          buf = (char*)malloc(len);
+
+          if (buf)
+          {
+             struct stat statbuf;
+             snprintf(buf, len, "%s/%s", path, p->d_name);
+             if (!stat(buf, &statbuf))
+             {
+                if (S_ISDIR(statbuf.st_mode))
+                {
+                   r2 = remove_directory(buf);
+                }
+                else
+                {
+                   r2 = unlink(buf);
+                }
+             }
+             free(buf);
+          }
+          r = r2;
+      }
+      closedir(d);
+   }
+   if (!r)
+   {
+      r = rmdir(path);
+   }
+   return r;
 }

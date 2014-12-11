@@ -22,6 +22,7 @@ public:
     void authenticate(std::string& user, std::string& pass);
     void send_image(Image *image_obj);
     void request_image(std::string image_name);
+    void delete_dir();
     virtual status DoOperation (Message *message, Message *reply, int s, SocketAddress serverSA);
     
 private:

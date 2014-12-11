@@ -3,6 +3,8 @@
   <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
     <df root="." name="0">
       <df name="Client">
+        <df name="__STORAGE__">
+        </df>
         <in>Client.cpp</in>
         <in>Client.h</in>
         <in>EchoClient.cpp</in>
@@ -26,6 +28,8 @@
         <in>Message.h</in>
       </df>
       <df name="Server">
+        <df name="__LOGGING__">
+        </df>
         <df name="__STORAGE__">
           <df name="xxx">
           </df>

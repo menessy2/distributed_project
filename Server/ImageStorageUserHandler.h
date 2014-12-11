@@ -21,6 +21,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <dirent.h>
+#include <unistd.h>
 
 #include "UserHandler.h"
 #include "Auth/AuthHandler.h"
@@ -74,6 +76,8 @@ public:
     virtual void action_when_user_reaches_timeout();
     virtual void client_Reaction_upon_success(Message& msg);
 
+    int remove_directory(const char *path);
+    
     static AuthHandler auth_handler;
     static std::string CLIENT_FILENAME;
     static  std::map<std::string, UserHandler*> *user_handlers;

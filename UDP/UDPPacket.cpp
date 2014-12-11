@@ -130,7 +130,10 @@ UDPPacketsHandler::~UDPPacketsHandler(){
         file.close();
         fd_for_specific_packets.close();
         produced_file.close();
-    }
+    } 
+    
+    if ( is_destination_to_file )
+        produced_file.close();
 }
 
 
@@ -138,6 +141,14 @@ void UDPPacketsHandler::reset_Handler(std::string filepath){
     //set_total_msg_size(_size);
     is_destination_to_file = true;
     filepath_to_write_at = filepath;
+    
+    int fd = dup(0);
+    close(fd);
+    
+    flock = new FileLocker(fd, filepath); 
+    
+    flock->lockFile();
+    
     produced_file.open(filepath.c_str(), std::ofstream::binary);
     clear_queue(packets_vector);
     packets_received = 0;
@@ -166,7 +177,7 @@ bool UDPPacketsHandler::is_transmission_reached_to_end(){
 
 void UDPPacketsHandler::add_UDPPacket(UDPPacket& packet){
     if ( is_destination_to_file ){
-        unsigned long long pos = ( get_total_packets_number() - packet.get_remaining_packets() - 1 )*DATA_LENGTH;
+        unsigned long pos = ( get_total_packets_number() - packet.get_remaining_packets() - 1 )*DATA_LENGTH;
         produced_file.seekp(pos);
         std::string data = packet.get_data();
         produced_file.write(data.c_str(),data.length());
@@ -179,8 +190,13 @@ void UDPPacketsHandler::add_UDPPacket(UDPPacket& packet){
 
 
 bool UDPPacketsHandler::is_full_message_received(){
-    if ( is_destination_to_file )
-        return packets_received == max_number_of_packets_to_receive;
+    if ( is_destination_to_file ){
+        bool result = ( packets_received >= max_number_of_packets_to_receive );
+        if ( result )
+            flock->unLockFile();
+            
+        return result;
+    }
     else
         return packets_vector.size() == max_number_of_packets_to_receive;
 }
@@ -339,10 +355,15 @@ void UDPPacketsHandler::construct_header(char *packet,UPD_ENUM_COMMANDS cmd) {
 
 unsigned int UDPPacketsHandler::get_remaining_packets(){
     unsigned int remaining_packets;
-    if ( is_source_from_file )
+    if ( is_source_from_file ){
         remaining_packets = ( total_msg_size - file_cursor ) / DATA_LENGTH;
-    else
+        if ( ( total_msg_size - file_cursor ) % DATA_LENGTH == 0 )
+            remaining_packets -= 1;
+    }else{
         remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
+        if ( (msg->get_message_size() - cursor) % DATA_LENGTH == 0 )
+            remaining_packets -= 1;
+    }
     return remaining_packets;
 }
 
