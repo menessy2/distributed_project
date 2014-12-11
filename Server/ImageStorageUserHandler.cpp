@@ -43,6 +43,7 @@ void ImageStorageUserHandler::loop(){
     
     unsigned int accumulative_window,magic_counter=0;
     bool is_first_window_packet = true;
+    unsigned long total_packet_size;
     
     while( true ){
         
@@ -170,6 +171,7 @@ void ImageStorageUserHandler::loop(){
             accumulative_window = packet.get_window_size();
             packets_handler.set_total_msg_size(packet.get_total_msg_size());
             is_first_window_packet = false;
+            total_packet_size = packet.get_total_msg_size();
         }
         
         packets_handler.add_UDPPacket( packet );
@@ -205,7 +207,8 @@ void ImageStorageUserHandler::loop(){
         user_handlers->erase(std::string(connected_ip)+":"+std::to_string(port));
     }
     
-    Message _msg(packets_handler.get_whole_received_data());
+    
+    Message _msg(std::to_string(total_packet_size));
     
     message_notification(_msg);
     
@@ -224,12 +227,33 @@ void ImageStorageUserHandler::loop(){
 
 
 void ImageStorageUserHandler::message_notification(Message& msg){
-    printf("---------------------------------------------\n");
-    if ( isServer )
-        printf("Image was successfully received: %s @ %s\n",logged_user.c_str(),filename.c_str());
-    else
+    
+    int fd = dup(0);
+    close(fd);
+    
+    
+    
+    if ( isServer ){
+        printf("Image was successfully received: %s\n", filename.c_str());
+        
+        std::string _filename = std::string(LOGGING);
+        FileLocker lock(fd, _filename );
+        std::fstream infile(_filename.c_str());
+        lock.lockFile();
+        
+        infile << "---------------------------------------------\n";
+        infile << "Client: " << std::string(inet_ntoa(destination.sin_addr)) << ':' << this->get_port() << std::endl;
+        infile << "Image was successfully received: " << filename << " from " << logged_user << std::endl;
+        infile << "Image bytes : " << msg.get_string() << std::endl;
+        infile << "---------------------------------------------\n";
+        
+        lock.unLockFile();
+    
+    }
+    else{
+        printf("---------------------------------------------\n");
         printf("Image was successfully received: %s\n",CLIENT_FILENAME.c_str());
-    //printf("Image size: %d\n",msg.get_message_size());
+    }
     
 }
 

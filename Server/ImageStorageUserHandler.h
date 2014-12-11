@@ -14,13 +14,23 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <fstream>
+#include <mutex>
+#include <condition_variable>
+#include <fstream>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #include "UserHandler.h"
 #include "Auth/AuthHandler.h"
 #include "../UDP/Commands/AUTHCommand.h"
+#include "../Misc/FileLocker.h"
 
 #define BASE_CLIENT_STORAGE "Client/__STORAGE__/"
 #define BASE_SERVER_STORAGE "Server/__STORAGE__/"
+
+#define LOGGING "Server/__LOGGING__/logging.txt"
 
 enum class Image_Status  {
     TRANSMITING,
