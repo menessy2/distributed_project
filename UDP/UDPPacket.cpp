@@ -101,26 +101,25 @@ is_destination_to_file(false) {
 
 UDPPacketsHandler::UDPPacketsHandler(const char *filename,UPD_ENUM_COMMANDS command) :
 is_source_from_file(true), command(command), max_number_of_packets_to_receive(0), is_destination_to_file(false) {
+    
     srand(time(0));
-    
-    
-    
     starting_sequence_number = static_cast<unsigned int>(rand() % (1 << (SEQUENCE_NUMBER_LENGTH-1)*BYTE_SIZE)-1);
     
-    pFile = fopen (filename,"r");
-    //file.open(filename, std::ios::in | std::ios::binary);
-    //fd_for_specific_packets.open(filename, std::ios::in | std::ios::binary);
+    file.open(filename, std::ios::in | std::ios::binary);
+    fd_for_specific_packets.open(filename, std::ios::in | std::ios::binary);
+    fd_for_specific_packets.seekg(0, std::ios::beg);
     
-    long begin,end;
+    std::streampos begin,end;
     
-    fseek (pFile, 0, SEEK_END);  
-    end = ftell(pFile);
+    file.seekg(0, std::ios::beg); 
+    begin = file.tellg();
+    file.seekg( 0, std::ios::end );
+    end = file.tellg();
     
-    total_msg_size = end;
-    fseek(pFile , 0 , SEEK_SET);
+    total_msg_size = end - begin;
     
-    //file.seekg(0, std::ios::beg); 
-    file_cursor = 0;
+    file.seekg( 0, std::ios::beg);
+    file_cursor = std::ios::beg;
     packets_received = 0;
 }
 
@@ -128,9 +127,9 @@ is_source_from_file(true), command(command), max_number_of_packets_to_receive(0)
 UDPPacketsHandler::~UDPPacketsHandler(){
     
     if ( is_source_from_file ) {
-        //file.close();
-        //fd_for_specific_packets->close();
-        //produced_file.close();
+        file.close();
+        fd_for_specific_packets.close();
+        produced_file.close();
     }
 }
 
@@ -167,7 +166,7 @@ bool UDPPacketsHandler::is_transmission_reached_to_end(){
 
 void UDPPacketsHandler::add_UDPPacket(UDPPacket& packet){
     if ( is_destination_to_file ){
-        unsigned long long pos = ( get_total_packets_number() - packet.get_remaining_packets() )*DATA_LENGTH;
+        unsigned long long pos = ( get_total_packets_number() - packet.get_remaining_packets() - 1 )*DATA_LENGTH;
         produced_file.seekp(pos);
         std::string data = packet.get_data();
         produced_file.write(data.c_str(),data.length());
@@ -201,8 +200,9 @@ void UDPPacketsHandler::get_next_packet(char *packet,unsigned int &size) {
     construct_header(packet);
     if ( is_source_from_file ){
         //file.seekg( 0, file_cursor );
-        fseek ( pFile , file_cursor , SEEK_SET );
-        size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(total_msg_size -  ftell(pFile) ) );
+        file_cursor = file.tellg();
+        unsigned int temp = static_cast<unsigned int>(file_cursor);
+        size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(total_msg_size - temp ) );
     }
     else
         size = std::min<unsigned int>(DATA_LENGTH,(unsigned int)(msg->get_message_size()- this->cursor) );
@@ -211,8 +211,8 @@ void UDPPacketsHandler::get_next_packet(char *packet,unsigned int &size) {
     bzero(buffer,DATA_LENGTH);
     
     if ( is_source_from_file ){
-        fread (buffer,1,size,pFile);
-        file_cursor = ftell(pFile);
+        file.read(buffer,size);
+        file_cursor = file.tellg();
     } else {
         msg->split_string(cursor, size, buffer);
         cursor += size;
@@ -236,8 +236,8 @@ void UDPPacketsHandler::get_specific_packet(char *packet,unsigned int &size,unsi
     bzero(buffer,DATA_LENGTH);
     
     if ( is_source_from_file ){
-        //fd_for_specific_packets->seekg(0, start);
-        //fd_for_specific_packets->read(buffer,size);
+        fd_for_specific_packets.seekg(start);
+        fd_for_specific_packets.read(buffer,size);
     }    
     else
         msg->split_string(start, size, buffer);
@@ -340,7 +340,7 @@ void UDPPacketsHandler::construct_header(char *packet,UPD_ENUM_COMMANDS cmd) {
 unsigned int UDPPacketsHandler::get_remaining_packets(){
     unsigned int remaining_packets;
     if ( is_source_from_file )
-        remaining_packets = ( total_msg_size - ftell(pFile) ) / DATA_LENGTH;
+        remaining_packets = ( total_msg_size - file_cursor ) / DATA_LENGTH;
     else
         remaining_packets = (msg->get_message_size() - cursor) / DATA_LENGTH;
     return remaining_packets;

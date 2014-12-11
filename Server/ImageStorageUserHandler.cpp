@@ -118,7 +118,8 @@ void ImageStorageUserHandler::loop(){
                     Message ok("ok");
                     Socket::UDPsend(sock_fd,&ok,destination,UPD_ENUM_COMMANDS::CREATE_FILE_SUCCESS);
                     messages_vector.pop();
-                    packets_handler.reset_Handler(filename);
+                    std::string _filepath = std::string(BASE_DIR) + logged_user + "/" + filename;
+                    packets_handler.reset_Handler(_filepath);
                     continue;
                 }
                 case UPD_ENUM_COMMANDS::REQUEST_FILE:
@@ -175,10 +176,10 @@ void ImageStorageUserHandler::loop(){
 
         packets_received_within_a_window.push_back(packet.get_remaining_packets());
         
-        /*
+        
         if ( ++magic_counter % MAGIC_NUMBER == 0)
             std::this_thread::sleep_for (std::chrono::milliseconds(500));
-        */
+        
         
         if ( ( ++window_counter % accumulative_window == 0) ) {
             // send acknowledgment

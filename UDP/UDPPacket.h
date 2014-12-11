@@ -90,9 +90,8 @@ private:
     std::string session;
     
     bool is_source_from_file;
-    //std::fstream file;
-    //std::fstream fd_for_specific_packets;
-    FILE * pFile;
+    std::fstream file;
+    std::fstream fd_for_specific_packets;
     std::streampos file_cursor;
     
     // For receiving packets

@@ -113,10 +113,11 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy ele.pdf</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy a.pdf</runcommandpicklistitem>
-          <runcommandpicklistitem>"${OUTPUT_PATH}" r</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy b.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" r</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy e.epub</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy b.pdf</runcommand>
+        <runcommand>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy e.epub</runcommand>
         <rundir>.</rundir>
         <buildfirst>false</buildfirst>
         <terminal-type>0</terminal-type>
