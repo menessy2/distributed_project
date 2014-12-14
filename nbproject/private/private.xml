@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <code-assistance-data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <code-model-enabled>true</code-model-enabled>
+    </code-assistance-data>
+    <data xmlns="http://www.netbeans.org/ns/make-project-private/1">
+        <activeConfTypeElem>0</activeConfTypeElem>
+        <activeConfIndexElem>0</activeConfIndexElem>
+    </data>
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/root/distributed_project/project/Server/UserHandler.cpp</file>
+            <file>file:/root/distributed_project/project/Client/ImageStorageClient.cpp</file>
+            <file>file:/root/distributed_project/project/Payload/Message.cpp</file>
+            <file>file:/root/distributed_project/project/UDP/UDPPacketConstants.h</file>
+            <file>file:/root/distributed_project/project/Server/EchoUserHandler.cpp</file>
+            <file>file:/root/distributed_project/project/Server/ImageStorageServer.h</file>
+            <file>file:/root/distributed_project/project/Server/Server.h</file>
+            <file>file:/root/distributed_project/project/Server/EchoServer.cpp</file>
+            <file>file:/root/distributed_project/project/UDP/UDPPacket.cpp</file>
+            <file>file:/root/distributed_project/project/Client/Client.cpp</file>
+            <file>file:/root/distributed_project/project/UDP/Commands/UDPCommands.h</file>
+            <file>file:/root/distributed_project/project/Server/Server.cpp</file>
+            <file>file:/root/distributed_project/project/Server/ImageStorageServer.cpp</file>
+            <file>file:/root/distributed_project/project/Client/EchoClient.cpp</file>
+            <file>file:/root/distributed_project/project/Server/UserHandler.h</file>
+            <file>file:/root/distributed_project/project/UDP/Commands/ACKCommand.cpp</file>
+            <file>file:/root/distributed_project/project/Client/Client.h</file>
+            <file>file:/root/distributed_project/project/UDP/Commands/ACKCommand.h</file>
+            <file>file:/root/distributed_project/project/UDP/Socket.h</file>
+            <file>file:/root/distributed_project/project/Client/EchoClient.h</file>
+            <file>file:/root/distributed_project/project/Client/ImageStorageClient.h</file>
+            <file>file:/root/distributed_project/project/UDP/Socket.cpp</file>
+            <file>file:/root/distributed_project/project/Server/ImageStorageUserHandler.h</file>
+            <file>file:/root/distributed_project/project/Server/ImageStorageUserHandler.cpp</file>
+            <file>file:/root/distributed_project/project/UDP/UDPPacket.h</file>
+        </group>
+    </open-files>
+</project-private>
