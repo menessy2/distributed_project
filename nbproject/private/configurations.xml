@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="95">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df root="." name="0">
+      <df name="Client">
+        <df name="__STORAGE__">
+        </df>
+        <in>Client.cpp</in>
+        <in>Client.h</in>
+        <in>EchoClient.cpp</in>
+        <in>EchoClient.h</in>
+        <in>ImageStorageClient.cpp</in>
+        <in>ImageStorageClient.h</in>
+      </df>
+      <df name="Misc">
+        <in>FileLocker.cpp</in>
+        <in>FileLocker.h</in>
+        <in>Filelocker.cpp</in>
+        <in>Security.cpp</in>
+        <in>Security.h</in>
+        <in>timer.cpp</in>
+        <in>timer.h</in>
+      </df>
+      <df name="Payload">
+        <in>Image.cpp</in>
+        <in>Image.h</in>
+        <in>Message.cpp</in>
+        <in>Message.h</in>
+      </df>
+      <df name="Server">
+        <df name="__LOGGING__">
+        </df>
+        <df name="__STORAGE__">
+          <df name="xxx">
+          </df>
+        </df>
+        <df name="Auth">
+          <in>AuthHandler.cpp</in>
+          <in>AuthHandler.h</in>
+        </df>
+        <in>EchoServer.cpp</in>
+        <in>EchoServer.h</in>
+        <in>EchoUserHandler.cpp</in>
+        <in>EchoUserHandler.h</in>
+        <in>ImageStorageServer.cpp</in>
+        <in>ImageStorageServer.h</in>
+        <in>ImageStorageUserHandler.cpp</in>
+        <in>ImageStorageUserHandler.h</in>
+        <in>Server.cpp</in>
+        <in>Server.h</in>
+        <in>ThreadPool.cpp</in>
+        <in>ThreadPool.h</in>
+        <in>UserHandler.cpp</in>
+        <in>UserHandler.h</in>
+      </df>
+      <df name="UDP">
+        <df name="Commands">
+          <in>ACKCommand.cpp</in>
+          <in>ACKCommand.h</in>
+          <in>AUTHCommand.cpp</in>
+          <in>AUTHCommand.h</in>
+          <in>UDPCommands.h</in>
+        </df>
+        <in>Socket.cpp</in>
+        <in>Socket.h</in>
+        <in>UDPPacket.cpp</in>
+        <in>UDPPacket.h</in>
+        <in>UDPPacketConstants.h</in>
+      </df>
+      <in>common.h</in>
+      <in>ex1.cpp</in>
+      <in>ex2.cpp</in>
+    </df>
+  </logicalFolder>
+  <projectmakefile>makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <developmentServer>localhost</developmentServer>
+        <platform>2</platform>
+      </toolsSet>
+      <compile>
+        <compiledirpicklist>
+          <compiledirpicklistitem>.</compiledirpicklistitem>
+          <compiledirpicklistitem>${AUTO_FOLDER}</compiledirpicklistitem>
+        </compiledirpicklist>
+        <compiledir>${AUTO_FOLDER}</compiledir>
+        <compilecommandpicklist>
+          <compilecommandpicklistitem>${MAKE} ${ITEM_NAME}.o</compilecommandpicklistitem>
+          <compilecommandpicklistitem>${AUTO_COMPILE}</compilecommandpicklistitem>
+        </compilecommandpicklist>
+        <compilecommand>${AUTO_COMPILE}</compilecommand>
+      </compile>
+      <dbx_gdbdebugger version="1">
+        <gdb_pathmaps>
+        </gdb_pathmaps>
+        <gdb_interceptlist>
+          <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
+        </gdb_interceptlist>
+        <gdb_options>
+          <DebugOptions>
+          </DebugOptions>
+        </gdb_options>
+        <gdb_buildfirst gdb_buildfirst_overriden="false" gdb_buildfirst_old="false"/>
+      </dbx_gdbdebugger>
+      <nativedebugger version="1">
+        <engine>gdb</engine>
+      </nativedebugger>
+      <runprofile version="9">
+        <runcommandpicklist>
+          <runcommandpicklistitem>./ex_2 s 127.0.0.1 5000 $(python -c 'print "A"*58')</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000 $(python -c 'print "A"*58')</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy ele.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy a.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy b.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy e.epub</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy e.pdf</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" s 127.0.0.1 5000  xxx yyy kk.img</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" r</runcommandpicklistitem>
+        </runcommandpicklist>
+        <runcommand>"${OUTPUT_PATH}" r</runcommand>
+        <rundir>.</rundir>
+        <buildfirst>false</buildfirst>
+        <terminal-type>0</terminal-type>
+        <remove-instrumentation>0</remove-instrumentation>
+        <environment>
+        </environment>
+      </runprofile>
+    </conf>
+  </confs>
+</configurationDescriptor>
