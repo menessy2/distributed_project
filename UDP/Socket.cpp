@@ -86,8 +86,8 @@ status Socket::UDPsend_ACK_support_with_fd(int s, const char *filename, \
         // handle acks and
         // wait for ack success
         condition.wait(lock);
-        sent_packets.clear();
-        received_packets.clear();
+        //sent_packets.clear();
+        //received_packets.clear();
         
     }
     

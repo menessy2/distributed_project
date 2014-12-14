@@ -57,12 +57,12 @@ void ImageStorageUserHandler::loop(){
         
         printf("received %d\n",packet_id);
         
-        
+        /*
         if ( ! packet.is_checksum_correct() ){
             messages_vector.pop();
             //refresh_keep_alive();
             continue;
-        }
+        }*/
         
         
         if ( isServer )  {
@@ -195,8 +195,9 @@ void ImageStorageUserHandler::loop(){
         if ( packet.get_remaining_packets() == 0 ){
             printf("break here");
         }
+        
         //if ( ++magic_counter % MAGIC_NUMBER == 0)
-        //    std::this_thread::sleep_for (std::chrono::milliseconds(200));
+        //    std::this_thread::sleep_for (std::chrono::milliseconds(500));
         
         
         if ( ( ++window_counter % accumulative_window == 0) ) {
@@ -204,7 +205,7 @@ void ImageStorageUserHandler::loop(){
             ACKCommand ack;
             Message msg = ack.construct_packet(&packets_received_within_a_window);
             Socket::UDPsend(sock_fd,&msg,destination,UPD_ENUM_COMMANDS::ACK_SUCCESS);
-            packets_received_within_a_window.clear();
+            //packets_received_within_a_window.clear();
             printf("* Acknowledgment of %d packets was sent *\n",window_counter);
             window_counter = 0;
             accumulative_window = packet.get_window_size();

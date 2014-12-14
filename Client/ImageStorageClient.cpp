@@ -37,7 +37,7 @@ void ImageStorageClient::send_image(Image *image_obj){
 
         
         Socket::UDPsend_ACK_support_with_fd(s, filename.c_str(), destinationSA,UPD_ENUM_COMMANDS::TRANSMIT_DATA,session);
-        //while(true);
+        while(true);
         //delete image;
     }
 }
